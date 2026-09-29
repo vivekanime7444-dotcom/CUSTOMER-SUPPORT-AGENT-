@@ -35,16 +35,10 @@ const handleChat = async (req, res, next) => {
       ? orders.filter(o => o && typeof o === 'object' && o.customerId === targetCustomerId)
       : [];
 
-    // Authoritative store fallback: if client omitted orders, or for CUST-1 ensure canonical orders are present
+    // Honor customer orders provided by client; only fall back to authoritative store if client omitted orders array
     let safeOrders = clientCustOrders;
     if (!Array.isArray(orders)) {
       safeOrders = AUTHORITATIVE_ORDERS.filter(o => o.customerId === targetCustomerId);
-    } else if (targetCustomerId === 'CUST-1') {
-      AUTHORITATIVE_ORDERS.filter(o => o.customerId === 'CUST-1').forEach(authOrder => {
-        if (!safeOrders.some(o => normalizeOrderId(o.orderId) === normalizeOrderId(authOrder.orderId))) {
-          safeOrders.push(authOrder);
-        }
-      });
     }
 
     // Context orderId verification (The backend MUST NOT blindly trust frontend orderId.

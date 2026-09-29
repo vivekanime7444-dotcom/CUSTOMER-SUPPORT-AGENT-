@@ -3,7 +3,7 @@ import {
   Send, Paperclip, MoreVertical, Search, 
   MessageSquare, Phone, Video, Info, 
   Sparkles, ShieldCheck, Clock, User,
-  ShoppingBag, Package, Settings
+  ShoppingBag, Package, Settings, RotateCcw
 } from 'lucide-react';
 import Store from './Store';
 import Orders from './Orders';
@@ -17,26 +17,8 @@ const INITIAL_MESSAGES = [
     id: 1,
     text: "Hello! Welcome to Nova Mart Support. How can I help you today?",
     sender: 'agent',
-    timestamp: '10:00 AM'
-  },
-  {
-    id: 2,
-    text: "Hi, I have a question about my recent order #NM-8472.",
-    sender: 'user',
-    timestamp: '10:02 AM'
-  },
-  {
-    id: 3,
-    text: "I'd be happy to check that for you. Give me just a moment to pull up the details.",
-    sender: 'agent',
-    timestamp: '10:03 AM'
+    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   }
-];
-
-const CHATS = [
-  { id: 1, name: "Order Tracking", preview: "I'd be happy to check that...", time: "10:03 AM", active: true, unread: 0 },
-  { id: 2, name: "Refund Request", preview: "Your refund has been processed.", time: "Yesterday", active: false, unread: 2 },
-  { id: 3, name: "Account Issue", preview: "Thank you for verifying.", time: "Monday", active: false, unread: 0 },
 ];
 
 function App() {
@@ -46,15 +28,12 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [activeOrderId, setActiveOrderId] = useState(null);
   const [orders, setOrders] = useState(() => {
-    const saved = localStorage.getItem('nova_mart_orders');
-    if (!saved) return INITIAL_ORDERS;
+    const saved = localStorage.getItem('nova_mart_orders_v2');
+    if (!saved) return [];
     try {
       const parsed = JSON.parse(saved);
-      if (!Array.isArray(parsed) || parsed.length === 0) {
-        return INITIAL_ORDERS;
-      }
-      // Migrate old data to new schema
-      const migrated = parsed.map(o => ({
+      if (!Array.isArray(parsed)) return [];
+      return parsed.map(o => ({
         ...o,
         status: (o.status || 'ORDER_PLACED').toUpperCase().replace(' ', '_'),
         cancellation: o.cancellation || { requested: false, status: null },
@@ -63,27 +42,14 @@ function App() {
         replacement: o.replacement || { status: null },
         trackingEvents: o.trackingEvents || []
       }));
-      // Ensure canonical NM-10001 and NM-8472 are present in customer orders
-      const has10001 = migrated.some(o => o.orderId === 'NM-10001');
-      const has8472 = migrated.some(o => o.orderId === 'NM-8472');
-      let result = [...migrated];
-      if (!has10001) {
-        const o10001 = INITIAL_ORDERS.find(o => o.orderId === 'NM-10001');
-        if (o10001) result.push(o10001);
-      }
-      if (!has8472) {
-        const o8472 = INITIAL_ORDERS.find(o => o.orderId === 'NM-8472');
-        if (o8472) result.push(o8472);
-      }
-      return result;
     } catch {
-      return INITIAL_ORDERS;
+      return [];
     }
   });
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    localStorage.setItem('nova_mart_orders', JSON.stringify(orders));
+    localStorage.setItem('nova_mart_orders_v2', JSON.stringify(orders));
   }, [orders]);
 
   const handleCreateOrder = (product, quantity) => {
@@ -346,8 +312,8 @@ function App() {
         {/* Header */}
         <header className="chat-header">
           <div className="header-user-info">
-            <div className="avatar">
-              <img src="https://ui-avatars.com/api/?name=Order+Tracking&background=2d2f45&color=fff" alt="User" />
+            <div className="avatar" style={{ background: activeOrderId ? '#334155' : 'var(--accent-gradient)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {activeOrderId ? <Package size={18} color="white" /> : <Sparkles size={18} color="white" />}
               <div className="status-dot"></div>
             </div>
             <div>
@@ -358,6 +324,33 @@ function App() {
             </div>
           </div>
           <div className="header-actions">
+            {activeOrderId && (
+              <button 
+                className="icon-btn" 
+                title="Clear active order filter" 
+                onClick={() => setActiveOrderId(null)}
+                style={{ fontSize: '12px', padding: '4px 10px', width: 'auto', borderRadius: '6px', color: 'var(--text-muted)' }}
+              >
+                Clear Context
+              </button>
+            )}
+            <button 
+              className="icon-btn" 
+              title="Start New Chat" 
+              onClick={() => {
+                setMessages([
+                  {
+                    id: Date.now(),
+                    text: "Hello! Welcome to Nova Mart Support. How can I help you today?",
+                    sender: 'agent',
+                    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                  }
+                ]);
+                setActiveOrderId(null);
+              }}
+            >
+              <RotateCcw size={18} />
+            </button>
             <button className="icon-btn"><Phone size={18} /></button>
             <button className="icon-btn"><Video size={18} /></button>
             <button className="icon-btn"><Search size={18} /></button>
@@ -367,7 +360,7 @@ function App() {
 
         {/* Messages */}
         <div className="messages-container">
-          <div className="system-message">Chat started securely at 10:00 AM</div>
+          <div className="system-message">Live session connected • Secure chat</div>
           
           {messages.map((msg) => (
             <div key={msg.id} className={`message-wrapper ${msg.sender === 'user' ? 'outgoing' : 'incoming'}`}>
@@ -483,7 +476,7 @@ function App() {
 
       {activeTab === 'orders' && (
         <main className="main-chat" style={{ background: 'var(--bg-main)', overflow: 'hidden' }}>
-          <Orders orders={orders} setOrders={setOrders} />
+          <Orders orders={orders} setOrders={setOrders} onNavigateToStore={() => setActiveTab('store')} />
         </main>
       )}
 

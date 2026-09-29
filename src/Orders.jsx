@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Package, XCircle, RefreshCcw, Box, ChevronDown, ChevronUp, Clock, CheckCircle } from 'lucide-react';
+import { Package, XCircle, RefreshCcw, Box, ChevronDown, ChevronUp, Clock, CheckCircle, ShoppingBag, Trash2, Plus } from 'lucide-react';
 import { canRequestCancellation, canRequestReturn, requestCancellation, requestReturn } from './utils/orderRules';
+import { INITIAL_ORDERS } from './mockData';
 
-const Orders = ({ orders, setOrders }) => {
+const Orders = ({ orders, setOrders, onNavigateToStore }) => {
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [returnState, setReturnState] = useState({});
 
@@ -20,10 +21,47 @@ const Orders = ({ orders, setOrders }) => {
 
   if (safeOrders.length === 0) {
     return (
-      <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
-        <Package size={48} style={{ marginBottom: '16px', opacity: 0.5 }} />
-        <h3>No orders yet</h3>
-        <p>Your recent orders will appear here.</p>
+      <div style={{ padding: '60px 20px', textAlign: 'center', color: 'var(--text-muted)' }}>
+        <Package size={56} style={{ marginBottom: '16px', opacity: 0.4, color: 'var(--accent-color)' }} />
+        <h3 style={{ fontSize: '20px', color: 'var(--text-main)', marginBottom: '8px' }}>No orders yet</h3>
+        <p style={{ maxWidth: '420px', margin: '0 auto 24px', lineHeight: '1.5' }}>
+          You haven't placed any orders yet. Visit the Store to browse products and place an order!
+        </p>
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+          {onNavigateToStore && (
+            <button 
+              onClick={onNavigateToStore}
+              style={{
+                background: 'var(--accent-gradient)',
+                color: '#fff',
+                border: 'none',
+                padding: '10px 22px',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontWeight: 600,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              <ShoppingBag size={18} /> Browse Store
+            </button>
+          )}
+          <button 
+            onClick={() => setOrders(INITIAL_ORDERS)}
+            style={{
+              background: 'var(--bg-secondary)',
+              color: 'var(--text-main)',
+              border: '1px solid var(--border-light)',
+              padding: '10px 18px',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontWeight: 500
+            }}
+          >
+            Load Sample Orders (Demo)
+          </button>
+        </div>
       </div>
     );
   }
@@ -79,7 +117,53 @@ const Orders = ({ orders, setOrders }) => {
 
   return (
     <div style={{ padding: '30px', height: '100%', overflowY: 'auto' }}>
-      <h2 style={{ marginBottom: '30px' }}>My Orders</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
+        <h2 style={{ margin: 0 }}>My Orders ({safeOrders.length})</h2>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          {onNavigateToStore && (
+            <button 
+              onClick={onNavigateToStore}
+              style={{
+                background: 'var(--accent-gradient)',
+                color: '#fff',
+                border: 'none',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontWeight: 600,
+                fontSize: '13px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              <Plus size={16} /> Place New Order
+            </button>
+          )}
+          <button 
+            onClick={() => {
+              if (window.confirm('Are you sure you want to clear all orders? This will delete all current orders.')) {
+                setOrders([]);
+              }
+            }}
+            style={{
+              background: 'transparent',
+              color: '#ef4444',
+              border: '1px solid rgba(239, 68, 68, 0.4)',
+              padding: '8px 14px',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontWeight: 500,
+              fontSize: '13px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+          >
+            <Trash2 size={15} /> Clear All Orders
+          </button>
+        </div>
+      </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         {safeOrders.map(order => {
           const isExpanded = expandedOrder === order.orderId;
