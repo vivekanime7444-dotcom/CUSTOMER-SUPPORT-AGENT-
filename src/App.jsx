@@ -10,6 +10,8 @@ import Orders from './Orders';
 import Admin from './Admin';
 import { INITIAL_ORDERS } from './mockData';
 
+const API_BASE = import.meta.env.VITE_API_URL || '';
+
 const INITIAL_MESSAGES = [
   {
     id: 1,
@@ -149,7 +151,7 @@ function App() {
         content: msg.text
       }));
 
-      const response = await fetch('http://localhost:5000/api/chat', {
+      const response = await fetch(`${API_BASE}/api/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -225,7 +227,7 @@ function App() {
         content: msg.text
       }));
 
-      const response = await fetch('http://localhost:5000/api/chat', {
+      const response = await fetch(`${API_BASE}/api/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
