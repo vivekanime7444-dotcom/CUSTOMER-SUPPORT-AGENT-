@@ -34,7 +34,16 @@ function App() {
     }
   });
 
-  const [activeTab, setActiveTab] = useState('chat'); // 'chat', 'store', 'orders'
+  const [activeTab, setActiveTab] = useState(() => {
+    const saved = localStorage.getItem('vmart_auth_user');
+    if (!saved) return 'store';
+    try {
+      const u = JSON.parse(saved);
+      return u.role === 'admin' ? 'admin' : 'store';
+    } catch {
+      return 'store';
+    }
+  });
   const [messages, setMessages] = useState(INITIAL_MESSAGES);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -70,7 +79,7 @@ function App() {
     if (user.role === 'admin') {
       setActiveTab('admin');
     } else {
-      setActiveTab('chat');
+      setActiveTab('store'); // In user login after login the first page is ekart page
     }
   };
 
@@ -78,7 +87,7 @@ function App() {
     if (window.confirm(`Are you sure you want to log out of ${currentUser?.name || 'V MART'}?`)) {
       setCurrentUser(null);
       localStorage.removeItem('vmart_auth_user');
-      setActiveTab('chat');
+      setActiveTab('store');
       setActiveOrderId(null);
     }
   };
@@ -127,10 +136,11 @@ function App() {
     scrollToBottom();
   }, [messages, isLoading]);
 
-  const handleSend = async () => {
-    if (!inputText.trim() || isLoading) return;
+  const handleSend = async (customText) => {
+    const textToSend = typeof customText === 'string' ? customText : inputText;
+    if (!textToSend.trim() || isLoading) return;
 
-    const userText = inputText;
+    const userText = textToSend.trim();
     const newMessage = {
       id: Date.now(),
       text: userText,
@@ -139,7 +149,9 @@ function App() {
     };
 
     setMessages(prev => [...prev, newMessage]);
-    setInputText('');
+    if (!customText) {
+      setInputText('');
+    }
     setIsLoading(true);
 
     try {
@@ -297,34 +309,69 @@ function App() {
           </div>
           <div>
             <div className="brand-title">V MART</div>
-            <div className="brand-subtitle">Support Hub</div>
+            <div className="brand-subtitle">eKart & Support Hub</div>
           </div>
         </div>
 
         <div className="nav-section">
-          <div className="nav-title">Main Navigation</div>
-          <div className={`chat-item ${activeTab === 'chat' ? 'active' : ''}`} onClick={() => setActiveTab('chat')} style={{ cursor: 'pointer' }}>
-            <div className="avatar">
-              <MessageSquare size={20} color={activeTab === 'chat' ? "#fff" : "#94a3b8"} />
+          <div className="nav-title">Menu</div>
+          
+          {/* 1st Option in side menu: eKart */}
+          <div 
+            className={`chat-item ${activeTab === 'store' ? 'active' : ''}`} 
+            onClick={() => setActiveTab('store')} 
+            style={{ cursor: 'pointer' }}
+          >
+            <div className="avatar" style={{ background: activeTab === 'store' ? 'var(--accent-gradient)' : '#1e293b' }}>
+              <ShoppingBag size={19} color={activeTab === 'store' ? "#fff" : "#94a3b8"} />
             </div>
             <div className="chat-info">
-              <div className="chat-name">AI Support</div>
+              <div className="chat-name" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span>eKart</span>
+                <span style={{ fontSize: '10px', background: 'rgba(99, 102, 241, 0.2)', color: '#a5b4fc', padding: '1px 6px', borderRadius: '6px', fontWeight: 600 }}>Store</span>
+              </div>
+              <div className="chat-preview">Explore & Shop Tech</div>
             </div>
           </div>
-          <div className={`chat-item ${activeTab === 'store' ? 'active' : ''}`} onClick={() => setActiveTab('store')} style={{ cursor: 'pointer' }}>
-            <div className="avatar">
-              <ShoppingBag size={20} color={activeTab === 'store' ? "#fff" : "#94a3b8"} />
+
+          {/* 2nd Option in side menu: My Orders */}
+          <div 
+            className={`chat-item ${activeTab === 'orders' ? 'active' : ''}`} 
+            onClick={() => setActiveTab('orders')} 
+            style={{ cursor: 'pointer' }}
+          >
+            <div className="avatar" style={{ background: activeTab === 'orders' ? 'var(--accent-gradient)' : '#1e293b' }}>
+              <Package size={19} color={activeTab === 'orders' ? "#fff" : "#94a3b8"} />
             </div>
             <div className="chat-info">
-              <div className="chat-name">Store</div>
+              <div className="chat-name" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span>My Orders</span>
+                {orders.length > 0 && (
+                  <span style={{ fontSize: '10px', background: 'rgba(16, 185, 129, 0.2)', color: '#34d399', padding: '1px 6px', borderRadius: '6px', fontWeight: 600 }}>
+                    {orders.length}
+                  </span>
+                )}
+              </div>
+              <div className="chat-preview">Track Shipments & Returns</div>
             </div>
           </div>
-          <div className={`chat-item ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => setActiveTab('orders')} style={{ cursor: 'pointer' }}>
-            <div className="avatar">
-              <Package size={20} color={activeTab === 'orders' ? "#fff" : "#94a3b8"} />
+
+          {/* 3rd / Last Option in side menu: Customer Support */}
+          <div 
+            className={`chat-item ${activeTab === 'chat' ? 'active' : ''}`} 
+            onClick={() => setActiveTab('chat')} 
+            style={{ cursor: 'pointer' }}
+          >
+            <div className="avatar" style={{ background: activeTab === 'chat' ? 'var(--accent-gradient)' : '#1e293b' }}>
+              <MessageSquare size={19} color={activeTab === 'chat' ? "#fff" : "#94a3b8"} />
+              <div className="status-dot" style={{ width: 10, height: 10 }}></div>
             </div>
             <div className="chat-info">
-              <div className="chat-name">My Orders</div>
+              <div className="chat-name" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span>Customer Support</span>
+                <span style={{ fontSize: '10px', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', padding: '1px 6px', borderRadius: '6px', fontWeight: 600 }}>24/7 AI</span>
+              </div>
+              <div className="chat-preview">Instant Help & Resolution</div>
             </div>
           </div>
         </div>
@@ -437,9 +484,9 @@ function App() {
             </div>
             <div>
               <div className="header-name">
-                {activeOrderId ? `Order Tracking — #${activeOrderId}` : 'V Mart AI Support'}
+                {activeOrderId ? `Customer Support — Order #${activeOrderId}` : 'Customer Support'}
               </div>
-              <div className="header-status">Live Support connected • Signed in as {currentUser?.name}</div>
+              <div className="header-status">Live AI Assistant connected • Signed in as {currentUser?.name}</div>
             </div>
           </div>
           <div className="header-actions">
@@ -583,13 +630,33 @@ function App() {
 
         {/* Input Area */}
         <div className="input-area">
+          {/* Modern Quick Suggestion Chips */}
+          <div className="quick-prompts-bar">
+            {[
+              "📦 Where is my order?",
+              "🔄 How do returns work?",
+              "⚡ Can I cancel my order?",
+              "🛍️ What's new in eKart?"
+            ].map((chip, idx) => (
+              <button 
+                key={idx} 
+                className="quick-chip"
+                onClick={() => handleSend(chip)}
+                disabled={isLoading}
+                type="button"
+              >
+                {chip}
+              </button>
+            ))}
+          </div>
+
           <div className="input-container">
-            <button className="icon-btn" style={{border: 'none', background: 'transparent'}}>
+            <button className="icon-btn" style={{border: 'none', background: 'transparent'}} title="Attach file" type="button">
               <Paperclip size={20} />
             </button>
             <textarea
               className="message-input"
-              placeholder="Type your message here..."
+              placeholder="Ask about orders, delivery, refunds, tech products..."
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -597,8 +664,10 @@ function App() {
             />
             <button 
               className="send-btn" 
-              onClick={handleSend}
-              disabled={!inputText.trim()}
+              onClick={() => handleSend()}
+              disabled={!inputText.trim() || isLoading}
+              title="Send message"
+              type="button"
             >
               <Send size={18} />
             </button>
@@ -608,13 +677,25 @@ function App() {
 
       {activeTab === 'store' && (
         <main className="main-chat" style={{ background: 'var(--bg-main)', overflow: 'hidden' }}>
-          <Store onCreateOrder={handleCreateOrder} />
+          <Store 
+            onCreateOrder={handleCreateOrder} 
+            onNavigateToOrders={() => setActiveTab('orders')}
+            onNavigateToSupport={() => setActiveTab('chat')}
+          />
         </main>
       )}
 
       {activeTab === 'orders' && (
         <main className="main-chat" style={{ background: 'var(--bg-main)', overflow: 'hidden' }}>
-          <Orders orders={orders} setOrders={setOrders} onNavigateToStore={() => setActiveTab('store')} />
+          <Orders 
+            orders={orders} 
+            setOrders={setOrders} 
+            onNavigateToStore={() => setActiveTab('store')} 
+            onNavigateToChat={(orderId) => {
+              setActiveOrderId(orderId);
+              setActiveTab('chat');
+            }}
+          />
         </main>
       )}
 
