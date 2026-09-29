@@ -206,7 +206,7 @@ const Orders = ({ orders, setOrders, onNavigateToStore, onNavigateToChat }) => {
   };
 
   return (
-    <div style={{ 
+    <div className="orders-container" style={{ 
       padding: '32px 36px', 
       height: '100%', 
       overflowY: 'auto',
@@ -302,6 +302,7 @@ const Orders = ({ orders, setOrders, onNavigateToStore, onNavigateToChat }) => {
           return (
             <div 
               key={order.orderId} 
+              className="order-card"
               style={{ 
                 background: 'var(--bg-card)', 
                 backdropFilter: 'blur(16px)',

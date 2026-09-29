@@ -47,7 +47,7 @@ const Store = ({ onCreateOrder, onNavigateToOrders, onNavigateToSupport }) => {
   };
 
   return (
-    <div style={{
+    <div className="store-container" style={{
       height: '100%',
       overflowY: 'auto',
       background: 'radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.06), transparent 30%), radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.06), transparent 30%), var(--bg-base)',
@@ -96,7 +96,7 @@ const Store = ({ onCreateOrder, onNavigateToOrders, onNavigateToSupport }) => {
       )}
 
       {/* Hero Showcase Banner */}
-      <div style={{
+      <div className="store-hero-banner" style={{
         background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.12) 50%, rgba(19, 20, 31, 0.8) 100%)',
         border: '1px solid rgba(255, 255, 255, 0.1)',
         borderRadius: '24px',
@@ -136,7 +136,7 @@ const Store = ({ onCreateOrder, onNavigateToOrders, onNavigateToSupport }) => {
             }}>
               <Sparkles size={14} /> Official eKart Tech Store
             </div>
-            <h1 style={{
+            <h1 className="store-hero-title" style={{
               fontSize: '34px',
               fontWeight: 700,
               margin: '0 0 10px 0',
@@ -171,7 +171,7 @@ const Store = ({ onCreateOrder, onNavigateToOrders, onNavigateToSupport }) => {
       </div>
 
       {/* Search & Category Filter Controls */}
-      <div style={{
+      <div className="store-filter-bar" style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -209,7 +209,7 @@ const Store = ({ onCreateOrder, onNavigateToOrders, onNavigateToSupport }) => {
         </div>
 
         {/* Search input */}
-        <div style={{
+        <div className="store-search-wrap" style={{
           display: 'flex',
           alignItems: 'center',
           gap: '10px',
@@ -253,7 +253,7 @@ const Store = ({ onCreateOrder, onNavigateToOrders, onNavigateToSupport }) => {
           <p style={{ fontSize: '14px' }}>Try selecting a different category or clearing your search filter.</p>
         </div>
       ) : (
-        <div style={{
+        <div className="store-products-grid" style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))',
           gap: '24px'

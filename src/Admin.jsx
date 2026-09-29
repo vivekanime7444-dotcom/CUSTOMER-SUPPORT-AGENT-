@@ -210,7 +210,7 @@ const Admin = ({ orders, setOrders }) => {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%', background: 'var(--bg-base)', color: 'var(--text-main)', overflow: 'hidden' }}>
       
       {/* ===================== SINGLE TOP ADMIN MENU BAR ===================== */}
-      <header style={{
+      <header className="admin-header-bar" style={{
         background: 'rgba(18, 25, 44, 0.85)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
@@ -340,7 +340,7 @@ const Admin = ({ orders, setOrders }) => {
       </header>
 
       {/* ===================== WORKSPACE CONTENT ===================== */}
-      <div style={{
+      <div className="admin-workspace" style={{
         flex: 1,
         overflowY: 'auto',
         padding: '28px 32px',

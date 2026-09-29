@@ -4,7 +4,8 @@ import {
   MessageSquare, Phone, Video, Info, 
   Sparkles, ShieldCheck, Clock, User,
   ShoppingBag, Package, Settings, RotateCcw,
-  LogOut, Shield, Lock, LifeBuoy, AlertTriangle, CheckCircle2
+  LogOut, Shield, Lock, LifeBuoy, AlertTriangle, CheckCircle2,
+  Menu, X
 } from 'lucide-react';
 import Store from './Store';
 import Orders from './Orders';
@@ -28,6 +29,7 @@ const INITIAL_MESSAGES = [
 ];
 
 function App() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(() => {
     const saved = localStorage.getItem('vmart_auth_user');
     if (!saved) return null;
@@ -374,16 +376,64 @@ function App() {
 
   return (
     <div className="app-container">
-      {/* Sidebar */}
-      <aside className="sidebar">
-        <div className="sidebar-header">
-          <div className="brand-icon">
-            <Sparkles size={20} color="white" />
+      {/* Mobile Top Header (only on <= 768px screens) */}
+      <header className="mobile-top-bar">
+        <button 
+          className="mobile-icon-btn" 
+          onClick={() => setMobileMenuOpen(true)}
+          aria-label="Open navigation menu"
+          type="button"
+        >
+          <Menu size={22} color="white" />
+        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className="brand-icon" style={{ width: 28, height: 28, borderRadius: 8 }}>
+            <Sparkles size={16} color="white" />
           </div>
-          <div>
-            <div className="brand-title">V MART</div>
-            <div className="brand-subtitle">eKart & Support Hub</div>
+          <span style={{ fontWeight: 700, fontSize: '16px', letterSpacing: '-0.02em', color: '#f8fafc' }}>
+            V MART
+          </span>
+          <span style={{ fontSize: '10px', color: '#06b6d4', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            {activeTab === 'store' ? '• Store' : activeTab === 'orders' ? '• Orders' : activeTab === 'chat' ? '• Support' : '• Admin'}
+          </span>
+        </div>
+        <button 
+          className="mobile-icon-btn" 
+          onClick={handleLogout}
+          title="Log Out"
+          type="button"
+          style={{ color: '#f87171' }}
+        >
+          <LogOut size={18} />
+        </button>
+      </header>
+
+      {/* Mobile Backdrop Overlay */}
+      <div 
+        className={`mobile-backdrop ${mobileMenuOpen ? 'open' : ''}`}
+        onClick={() => setMobileMenuOpen(false)}
+      />
+
+      {/* Sidebar (Permanent on Desktop, Slide-over Drawer on Mobile) */}
+      <aside className={`sidebar ${mobileMenuOpen ? 'mobile-open' : ''}`}>
+        <div className="sidebar-header" style={{ justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div className="brand-icon">
+              <Sparkles size={20} color="white" />
+            </div>
+            <div>
+              <div className="brand-title">V MART</div>
+              <div className="brand-subtitle">eKart & Support Hub</div>
+            </div>
           </div>
+          <button 
+            className="mobile-close-btn"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-label="Close menu"
+            type="button"
+          >
+            <X size={18} color="#94a3b8" />
+          </button>
         </div>
 
         <div className="nav-section">
@@ -392,7 +442,7 @@ function App() {
           {/* 1st Option in side menu: eKart */}
           <div 
             className={`chat-item ${activeTab === 'store' ? 'active' : ''}`} 
-            onClick={() => setActiveTab('store')} 
+            onClick={() => { setActiveTab('store'); setMobileMenuOpen(false); }} 
             style={{ cursor: 'pointer' }}
           >
             <div className="avatar" style={{ background: activeTab === 'store' ? 'var(--accent-gradient)' : '#1e293b' }}>
@@ -410,7 +460,7 @@ function App() {
           {/* 2nd Option in side menu: My Orders */}
           <div 
             className={`chat-item ${activeTab === 'orders' ? 'active' : ''}`} 
-            onClick={() => setActiveTab('orders')} 
+            onClick={() => { setActiveTab('orders'); setMobileMenuOpen(false); }} 
             style={{ cursor: 'pointer' }}
           >
             <div className="avatar" style={{ background: activeTab === 'orders' ? 'var(--accent-gradient)' : '#1e293b' }}>
@@ -432,7 +482,7 @@ function App() {
           {/* 3rd / Last Option in side menu: Customer Support */}
           <div 
             className={`chat-item ${activeTab === 'chat' ? 'active' : ''}`} 
-            onClick={() => setActiveTab('chat')} 
+            onClick={() => { setActiveTab('chat'); setMobileMenuOpen(false); }} 
             style={{ cursor: 'pointer' }}
           >
             <div className="avatar" style={{ background: activeTab === 'chat' ? 'var(--accent-gradient)' : '#1e293b' }}>
@@ -454,7 +504,7 @@ function App() {
           <div style={{ padding: '12px 16px', borderTop: '1px solid var(--border-light)' }}>
              <div 
                className={`chat-item ${activeTab === 'admin' ? 'active' : ''}`} 
-               onClick={() => setActiveTab('admin')} 
+               onClick={() => { setActiveTab('admin'); setMobileMenuOpen(false); }} 
                style={{ cursor: 'pointer' }}
              >
                 <div className="avatar" style={{background: 'linear-gradient(135deg, #10b981, #06b6d4)'}}>
@@ -605,10 +655,10 @@ function App() {
             >
               <RotateCcw size={18} />
             </button>
-            <button className="icon-btn"><Phone size={18} /></button>
-            <button className="icon-btn"><Video size={18} /></button>
-            <button className="icon-btn"><Search size={18} /></button>
-            <button className="icon-btn"><Info size={18} /></button>
+            <button className="icon-btn desktop-only"><Phone size={18} /></button>
+            <button className="icon-btn desktop-only"><Video size={18} /></button>
+            <button className="icon-btn desktop-only"><Search size={18} /></button>
+            <button className="icon-btn desktop-only"><Info size={18} /></button>
             <button 
               onClick={handleLogout}
               className="icon-btn" 
@@ -834,6 +884,55 @@ function App() {
           <Admin orders={orders} setOrders={setOrders} />
         </main>
       )}
+
+      {/* Mobile Bottom Navigation Bar (Fixed bottom on <= 768px screens) */}
+      <nav className="mobile-bottom-nav">
+        <button 
+          className={`mobile-nav-btn ${activeTab === 'store' ? 'active' : ''}`}
+          onClick={() => { setActiveTab('store'); setMobileMenuOpen(false); }}
+          type="button"
+        >
+          <ShoppingBag size={20} />
+          <span>eKart</span>
+        </button>
+
+        <button 
+          className={`mobile-nav-btn ${activeTab === 'orders' ? 'active' : ''}`}
+          onClick={() => { setActiveTab('orders'); setMobileMenuOpen(false); }}
+          type="button"
+        >
+          <div style={{ position: 'relative', display: 'inline-flex' }}>
+            <Package size={20} />
+            {orders.length > 0 && (
+              <span className="mobile-nav-badge">{orders.length}</span>
+            )}
+          </div>
+          <span>Orders</span>
+        </button>
+
+        <button 
+          className={`mobile-nav-btn ${activeTab === 'chat' ? 'active' : ''}`}
+          onClick={() => { setActiveTab('chat'); setMobileMenuOpen(false); }}
+          type="button"
+        >
+          <div style={{ position: 'relative', display: 'inline-flex' }}>
+            <MessageSquare size={20} />
+            <span className="mobile-nav-live-dot" />
+          </div>
+          <span>Support</span>
+        </button>
+
+        {currentUser?.role === 'admin' && (
+          <button 
+            className={`mobile-nav-btn ${activeTab === 'admin' ? 'active' : ''}`}
+            onClick={() => { setActiveTab('admin'); setMobileMenuOpen(false); }}
+            type="button"
+          >
+            <ShieldCheck size={20} />
+            <span>Admin</span>
+          </button>
+        )}
+      </nav>
     </div>
   );
 }
