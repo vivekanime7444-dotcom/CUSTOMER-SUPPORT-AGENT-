@@ -224,6 +224,14 @@ ${ordersSummaryStr}`;
       }
     }
 
+    // All models were skipped (all hit TPD / quota exhausted)
+    if (!response) {
+      const exhaustedError = new Error('All AI models have reached their daily token quota (TPD). Please try again later.');
+      exhaustedError.status = 429;
+      exhaustedError.allModelsExhausted = true;
+      throw exhaustedError;
+    }
+
     if (!response.ok) {
       let errorBody;
       try {

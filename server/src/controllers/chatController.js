@@ -164,6 +164,11 @@ const handleChat = async (req, res, next) => {
         });
       }
       
+      // All models hit daily token quota and no order context to fall back on
+      if (apiError.allModelsExhausted || (isRateLimit && safeOrders.length === 0)) {
+        return res.status(503).json({ error: 'The AI assistant is temporarily at capacity. Please try again in a few minutes.' });
+      }
+
       if (apiError.message === 'GROQ_API_KEY is missing') {
         return res.status(500).json({ error: 'The AI service is not configured. Please set the GROQ_API_KEY.' });
       }
