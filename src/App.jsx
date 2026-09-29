@@ -383,9 +383,16 @@ function App() {
                     </div>
                   )}
 
-                  {msg.requiresOrderSelection && msg.orderOptions && msg.orderOptions.length > 0 && (
+                  {((msg.requiresOrderSelection && msg.orderOptions && msg.orderOptions.length > 0) || 
+                    (msg.sender === 'agent' && !activeOrderId && orders.length > 1 && /(which order|which one|order id or the product name|select an order|which of these|shipping information for\?)/i.test(msg.text))) && (
                     <div className="order-selector-container">
-                      {msg.orderOptions.map((opt) => (
+                      {(msg.orderOptions && msg.orderOptions.length > 0 ? msg.orderOptions : orders.map(o => ({
+                        orderId: o.orderId,
+                        productName: o.items?.[0]?.productName || o.productName || 'Product',
+                        status: o.status,
+                        returnStatus: o.return?.requested ? (o.return.status || 'PENDING') : null,
+                        refundStatus: o.refund?.status || null
+                      }))).map((opt) => (
                         <div 
                           key={opt.orderId} 
                           className="order-option-card"
@@ -399,8 +406,12 @@ function App() {
                               <span className="order-option-product">{opt.productName}</span>
                             </div>
                             <div className="order-option-badges">
-                              <span className={`order-status-badge ${opt.status === 'DELIVERED' ? 'badge-delivered' : 'badge-shipped'}`}>
-                                {opt.status}
+                              <span className={`order-status-badge ${
+                                opt.status === 'DELIVERED' ? 'badge-delivered' :
+                                opt.status === 'ORDER_PLACED' ? 'badge-placed' :
+                                opt.status === 'PROCESSING' ? 'badge-processing' : 'badge-shipped'
+                              }`}>
+                                {opt.status ? opt.status.replace(/_/g, ' ') : 'ORDER PLACED'}
                               </span>
                               {opt.returnStatus && (
                                 <span className="order-status-badge badge-return">

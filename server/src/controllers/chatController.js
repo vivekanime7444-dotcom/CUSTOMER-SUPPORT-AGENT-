@@ -1,7 +1,7 @@
 const { generateChatResponse } = require('../services/aiService');
 const { normalizeOrderId } = require('../services/toolsService');
 const { AUTHORITATIVE_ORDERS } = require('../models/orderStore');
-const { findRelevantOrders } = require('../services/orderRelevanceService');
+const { findRelevantOrders, toOrderOptions } = require('../services/orderRelevanceService');
 
 const handleChat = async (req, res, next) => {
   console.log('[SECURITY] Incoming /api/chat request received');
@@ -81,11 +81,24 @@ const handleChat = async (req, res, next) => {
       const memoryUsed = Boolean(chatRes.memoryUsed);
       const memoryContext = chatRes.memoryContext || null;
 
+      // Smart Disambiguation Detection: If no single order was locked in context,
+      // and multiple orders exist, and the AI's reply lists multiple customer orders
+      // or asks the customer to choose/select an order, automatically provide orderOptions
+      // so interactive selection cards are displayed!
+      const mentionedOrders = safeOrders.filter(o => 
+        replyText.includes(o.orderId) || 
+        (o.items?.[0]?.productName && replyText.toLowerCase().includes(o.items[0].productName.toLowerCase()))
+      );
+      const asksToChooseOrder = /(which order|which one|select an order|choose an order|tell me the order|let me know which order|which of these|would you like to track)/i.test(replyText);
+
+      const shouldShowSelection = !verifiedContextOrderId && safeOrders.length > 1 && (mentionedOrders.length >= 2 || (asksToChooseOrder && safeOrders.length > 1));
+      const orderOptions = shouldShowSelection ? toOrderOptions(mentionedOrders.length >= 2 ? mentionedOrders : safeOrders) : [];
+
       res.json({ 
         reply: replyText,
-        requiresOrderSelection: false,
+        requiresOrderSelection: shouldShowSelection,
         activeOrderId: verifiedContextOrderId,
-        orderOptions: [],
+        orderOptions: orderOptions,
         memoryUsed: memoryUsed,
         memoryContext: memoryContext
       });

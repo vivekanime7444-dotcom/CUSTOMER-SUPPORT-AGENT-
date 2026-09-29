@@ -73,7 +73,19 @@ const getProductKeywords = (order) => {
  * Evaluates user query against customer's authorized orders
  */
 const findRelevantOrders = (query = '', orders = [], activeOrderId = null) => {
-  const q = String(query).trim().toLowerCase();
+  let q = String(query).trim().toLowerCase();
+  
+  // Normalize common user typos and phrasing variations
+  q = q
+    .replace(/\b(oeder|oder|ordr|orde|orderr|oreder|ord)\b/gi, 'order')
+    .replace(/\b(oeders|oders|ordrs|oreders)\b/gi, 'orders')
+    .replace(/\b(delivry|delivey|dlvery|delvry)\b/gi, 'delivery')
+    .replace(/\b(pakage|packge|pakg|pckage)\b/gi, 'package')
+    .replace(/\b(shipmnt|shippment|shiping)\b/gi, 'shipment')
+    .replace(/\b(trck|trcking|traking|traxking)\b/gi, 'tracking')
+    .replace(/\b(refnd|rfund)\b/gi, 'refund')
+    .replace(/\b(reurn|retrn|retun)\b/gi, 'return')
+    .replace(/\b(where's|wheres)\b/gi, 'where is');
   
   // 0 orders check
   if (!orders || orders.length === 0) {
@@ -288,7 +300,7 @@ const findRelevantOrders = (query = '', orders = [], activeOrderId = null) => {
   }
 
   // 5. TRACKING / SHIPPING SPECIFIC QUESTIONS
-  const isTrackingQuery = /\b(where is my order|track|tracking|shipment|delivery|in transit|arrive|package)\b/i.test(q);
+  const isTrackingQuery = /\b(where is|where are|track|tracking|shipment|delivery|in transit|arrive|package|status|when will|shipped|dispatched)\b/i.test(q);
   if (isTrackingQuery) {
     if (orders.length > 1) {
       return {
@@ -296,13 +308,13 @@ const findRelevantOrders = (query = '', orders = [], activeOrderId = null) => {
         requiresSelection: true,
         orderOptions: toOrderOptions(orders),
         matchingOrders: orders,
-        message: `I found ${orders.length} orders. Which order would you like to track?`
+        message: `I found ${orders.length} orders in your account. Which order would you like to check?`
       };
     }
   }
 
-  // 6. GENERAL ORDER QUESTIONS WITH MULTIPLE ORDERS ("my orders", "show orders", etc.)
-  const isGeneralOrderQuery = /\b(order|orders)\b/i.test(q);
+  // 6. GENERAL ORDER QUESTIONS WITH MULTIPLE ORDERS ("my orders", "show orders", "orders", etc.)
+  const isGeneralOrderQuery = /\b(order|orders|package|packages|item|items|purchase|purchases)\b/i.test(q);
   if (isGeneralOrderQuery && orders.length > 1) {
     return {
       type: 'GENERAL_MULTIPLE_ORDERS',
