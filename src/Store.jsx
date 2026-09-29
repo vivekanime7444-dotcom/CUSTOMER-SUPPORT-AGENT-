@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { PRODUCTS } from './mockData';
+import React, { useState, useMemo, useEffect } from 'react';
+import { getProducts } from './utils/productStore';
 import { 
   ShoppingCart, Star, ArrowLeft, Search, Zap, 
   Check, Eye, Truck, ShieldCheck, Sparkles, Plus, Minus,
@@ -9,21 +9,30 @@ import {
 const CATEGORIES = ['All', 'Smartphones', 'Laptops', 'Headphones', 'Smartwatches', 'Monitors', 'Accessories'];
 
 const Store = ({ onCreateOrder, onNavigateToOrders, onNavigateToSupport }) => {
+  const [productsList, setProductsList] = useState(getProducts);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [recentlyOrdered, setRecentlyOrdered] = useState(null);
 
+  useEffect(() => {
+    const handleProductsUpdated = () => {
+      setProductsList(getProducts());
+    };
+    window.addEventListener('vmart_products_updated', handleProductsUpdated);
+    return () => window.removeEventListener('vmart_products_updated', handleProductsUpdated);
+  }, []);
+
   const filteredProducts = useMemo(() => {
-    return PRODUCTS.filter(p => {
+    return productsList.filter(p => {
       const matchesCategory = activeCategory === 'All' || p.category.toLowerCase() === activeCategory.toLowerCase();
       const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                             p.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
                             p.category.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesCategory && matchesSearch;
     });
-  }, [activeCategory, searchQuery]);
+  }, [productsList, activeCategory, searchQuery]);
 
   const handleOrder = (productToOrder, qty) => {
     const p = productToOrder || selectedProduct;

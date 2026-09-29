@@ -4,13 +4,16 @@ import {
   MessageSquare, Phone, Video, Info, 
   Sparkles, ShieldCheck, Clock, User,
   ShoppingBag, Package, Settings, RotateCcw,
-  LogOut, Shield, Lock
+  LogOut, Shield, Lock, LifeBuoy, AlertTriangle, CheckCircle2
 } from 'lucide-react';
 import Store from './Store';
 import Orders from './Orders';
 import Admin from './Admin';
 import Auth from './Auth';
 import { INITIAL_ORDERS } from './mockData';
+import { 
+  createTicket, getCustomerTickets, getUndeliveredAdminReplies, markRepliesDelivered 
+} from './utils/ticketStore';
 
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
@@ -48,6 +51,9 @@ function App() {
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [activeOrderId, setActiveOrderId] = useState(null);
+  const [customerTickets, setCustomerTickets] = useState(() => {
+    return currentUser ? getCustomerTickets(currentUser.id) : [];
+  });
   const [orders, setOrders] = useState(() => {
     const saved = localStorage.getItem('nova_mart_orders_v2');
     if (!saved) return [];
@@ -72,6 +78,41 @@ function App() {
   useEffect(() => {
     localStorage.setItem('nova_mart_orders_v2', JSON.stringify(orders));
   }, [orders]);
+
+  // Real-time synchronization of human support tickets & Admin replies delivered directly into chat
+  useEffect(() => {
+    if (!currentUser || currentUser.role === 'admin') return;
+
+    const syncCustomerTicketsAndReplies = () => {
+      const tkts = getCustomerTickets(currentUser.id);
+      setCustomerTickets(tkts);
+
+      const undelivered = getUndeliveredAdminReplies(currentUser.id);
+      if (undelivered && undelivered.length > 0) {
+        undelivered.forEach(t => {
+          const adminBubble = {
+            id: Date.now() + Math.random(),
+            text: `👑 **Official Administrator Resolution** (Ticket #${t.id})\n\n"${t.adminReply}"\n\n*Status: ${t.status} • Solved by Human Support Administrator*`,
+            sender: 'agent',
+            isAdminResolution: true,
+            ticketId: t.id,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          };
+          setMessages(prev => [...prev, adminBubble]);
+        });
+        markRepliesDelivered(currentUser.id);
+      }
+    };
+
+    syncCustomerTicketsAndReplies();
+    const interval = setInterval(syncCustomerTicketsAndReplies, 2500);
+    window.addEventListener('vmart_tickets_updated', syncCustomerTicketsAndReplies);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('vmart_tickets_updated', syncCustomerTicketsAndReplies);
+    };
+  }, [currentUser]);
 
   const handleLogin = (user) => {
     setCurrentUser(user);
@@ -153,6 +194,37 @@ function App() {
       setInputText('');
     }
     setIsLoading(true);
+
+    // Detect human customer support intent
+    const isHumanRequest = /(human|real person|talk to person|talk to human|speak to human|speak to a person|agent can't help|agent cannot help|cant help|manual review|escalat|representative|contact support|customer care|speak with human)/i.test(userText);
+
+    if (isHumanRequest) {
+      const newTkt = createTicket({
+        customerId: currentUser?.id || 'CUST-1',
+        customerName: currentUser?.name || 'Customer',
+        customerEmail: currentUser?.email || 'customer@vmart.com',
+        orderId: activeOrderId || (orders.length > 0 ? orders[0].orderId : null),
+        subject: activeOrderId ? `Escalation for Order #${activeOrderId}` : "Customer Escalation to Human Support",
+        message: userText,
+        transcript: messages.slice(-4).map(m => ({ sender: m.sender, text: m.text }))
+      });
+
+      setCustomerTickets(getCustomerTickets(currentUser?.id || 'CUST-1'));
+
+      setTimeout(() => {
+        const escalationReply = {
+          id: Date.now() + 1,
+          text: `🚨 **Request Sent to Human Support Administrator**\n\nTicket ID: **#${newTkt.id}**\nPriority: **HIGH**\n\nI have forwarded your inquiry and conversation history directly to our Administrator team.\n\nWhenever an administrator is available, they will review your case and submit an official resolution directly here into this chat. Thank you for your patience!`,
+          sender: 'agent',
+          isEscalation: true,
+          ticketId: newTkt.id,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+        setMessages(prev => [...prev, escalationReply]);
+        setIsLoading(false);
+      }, 500);
+      return;
+    }
 
     try {
       const formattedHistory = messages.map(msg => ({
@@ -486,7 +558,26 @@ function App() {
               <div className="header-name">
                 {activeOrderId ? `Customer Support — Order #${activeOrderId}` : 'Customer Support'}
               </div>
-              <div className="header-status">Live AI Assistant connected • Signed in as {currentUser?.name}</div>
+              <div className="header-status" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <span>Live AI Support connected • Signed in as {currentUser?.name}</span>
+                {customerTickets.some(t => t.status === 'PENDING') && (
+                  <span style={{
+                    background: 'rgba(239, 68, 68, 0.15)',
+                    border: '1px solid rgba(239, 68, 68, 0.4)',
+                    color: '#f87171',
+                    padding: '2px 8px',
+                    borderRadius: '12px',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}>
+                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#ef4444', animation: 'pulse 1s infinite' }} />
+                    Ticket #{customerTickets.find(t => t.status === 'PENDING')?.id}: Escalated to Admin
+                  </span>
+                )}
+              </div>
             </div>
           </div>
           <div className="header-actions">
@@ -539,12 +630,52 @@ function App() {
           {messages.map((msg) => (
             <div key={msg.id} className={`message-wrapper ${msg.sender === 'user' ? 'outgoing' : 'incoming'}`}>
               {msg.sender === 'agent' && (
-                <div className="avatar" style={{width: 32, height: 32, background: 'var(--accent-gradient)'}}>
-                  <Sparkles size={16} color="white" />
+                <div className="avatar" style={{
+                  width: 32, 
+                  height: 32, 
+                  background: msg.isAdminResolution ? 'linear-gradient(135deg, #10b981, #06b6d4)' : 'var(--accent-gradient)'
+                }}>
+                  {msg.isAdminResolution ? <ShieldCheck size={16} color="white" /> : <Sparkles size={16} color="white" />}
                 </div>
               )}
               <div className="message-content">
-                <div className="message-bubble">
+                <div className="message-bubble" style={msg.isAdminResolution ? { border: '1px solid rgba(16, 185, 129, 0.4)', background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(6, 182, 212, 0.08))' } : {}}>
+                  {msg.isAdminResolution && (
+                    <div style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      background: 'rgba(16, 185, 129, 0.2)',
+                      border: '1px solid rgba(16, 185, 129, 0.4)',
+                      padding: '3px 8px',
+                      borderRadius: '6px',
+                      fontSize: '11px',
+                      color: '#34d399',
+                      fontWeight: 700,
+                      marginBottom: '8px'
+                    }}>
+                      <ShieldCheck size={13} /> Official Admin Resolution
+                    </div>
+                  )}
+
+                  {msg.isEscalation && (
+                    <div style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      background: 'rgba(239, 68, 68, 0.2)',
+                      border: '1px solid rgba(239, 68, 68, 0.4)',
+                      padding: '3px 8px',
+                      borderRadius: '6px',
+                      fontSize: '11px',
+                      color: '#f87171',
+                      fontWeight: 700,
+                      marginBottom: '8px'
+                    }}>
+                      <AlertTriangle size={13} /> Escalated to Human Support
+                    </div>
+                  )}
+
                   {msg.text}
 
                   {msg.sender === 'agent' && msg.memoryUsed && msg.memoryContext && (
@@ -633,6 +764,7 @@ function App() {
           {/* Modern Quick Suggestion Chips */}
           <div className="quick-prompts-bar">
             {[
+              "👤 Speak with Human Support",
               "📦 Where is my order?",
               "🔄 How do returns work?",
               "⚡ Can I cancel my order?",
@@ -644,6 +776,7 @@ function App() {
                 onClick={() => handleSend(chip)}
                 disabled={isLoading}
                 type="button"
+                style={chip.includes('Human') ? { border: '1px solid rgba(239, 68, 68, 0.4)', background: 'rgba(239, 68, 68, 0.12)', color: '#fca5a5' } : {}}
               >
                 {chip}
               </button>

@@ -75,6 +75,11 @@ const Auth = ({ onLogin }) => {
       return;
     }
 
+    if (found.status === 'suspended') {
+      setErrorMsg('This account has been suspended by an administrator. Please contact support.');
+      return;
+    }
+
     if (found.password !== pass) {
       setErrorMsg('Incorrect password. Please try again.');
       return;
@@ -107,6 +112,11 @@ const Auth = ({ onLogin }) => {
 
     if (!found) {
       setErrorMsg('Admin credentials not recognized or insufficient privileges.');
+      return;
+    }
+
+    if (found.status === 'suspended') {
+      setErrorMsg('This administrator account has been disabled.');
       return;
     }
 
