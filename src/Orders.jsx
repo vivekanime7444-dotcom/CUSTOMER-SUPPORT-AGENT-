@@ -6,7 +6,19 @@ const Orders = ({ orders, setOrders }) => {
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [returnState, setReturnState] = useState({});
 
-  if (orders.length === 0) {
+  // Defensively normalize orders to guarantee required fields exist,
+  // regardless of what was persisted in localStorage from older versions.
+  const safeOrders = (orders || []).map(o => ({
+    ...o,
+    cancellation: o.cancellation || { requested: false, status: null },
+    return: o.return || { requested: false, status: null },
+    refund: o.refund || { status: null },
+    replacement: o.replacement || { status: null },
+    trackingEvents: o.trackingEvents || [],
+    items: o.items || []
+  }));
+
+  if (safeOrders.length === 0) {
     return (
       <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
         <Package size={48} style={{ marginBottom: '16px', opacity: 0.5 }} />
@@ -69,7 +81,7 @@ const Orders = ({ orders, setOrders }) => {
     <div style={{ padding: '30px', height: '100%', overflowY: 'auto' }}>
       <h2 style={{ marginBottom: '30px' }}>My Orders</h2>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        {orders.map(order => {
+        {safeOrders.map(order => {
           const isExpanded = expandedOrder === order.orderId;
           const rState = returnState[order.orderId] || { active: false, reason: '', resolution: '' };
           const firstItem = order.items && order.items.length > 0 ? order.items[0] : null;
