@@ -3,11 +3,13 @@ import {
   Send, Paperclip, MoreVertical, Search, 
   MessageSquare, Phone, Video, Info, 
   Sparkles, ShieldCheck, Clock, User,
-  ShoppingBag, Package, Settings, RotateCcw
+  ShoppingBag, Package, Settings, RotateCcw,
+  LogOut, Shield, Lock
 } from 'lucide-react';
 import Store from './Store';
 import Orders from './Orders';
 import Admin from './Admin';
+import Auth from './Auth';
 import { INITIAL_ORDERS } from './mockData';
 
 const API_BASE = import.meta.env.VITE_API_URL || '';
@@ -22,6 +24,16 @@ const INITIAL_MESSAGES = [
 ];
 
 function App() {
+  const [currentUser, setCurrentUser] = useState(() => {
+    const saved = localStorage.getItem('vmart_auth_user');
+    if (!saved) return null;
+    try {
+      return JSON.parse(saved);
+    } catch {
+      return null;
+    }
+  });
+
   const [activeTab, setActiveTab] = useState('chat'); // 'chat', 'store', 'orders'
   const [messages, setMessages] = useState(INITIAL_MESSAGES);
   const [inputText, setInputText] = useState('');
@@ -52,11 +64,30 @@ function App() {
     localStorage.setItem('nova_mart_orders_v2', JSON.stringify(orders));
   }, [orders]);
 
+  const handleLogin = (user) => {
+    setCurrentUser(user);
+    localStorage.setItem('vmart_auth_user', JSON.stringify(user));
+    if (user.role === 'admin') {
+      setActiveTab('admin');
+    } else {
+      setActiveTab('chat');
+    }
+  };
+
+  const handleLogout = () => {
+    if (window.confirm(`Are you sure you want to log out of ${currentUser?.name || 'V MART'}?`)) {
+      setCurrentUser(null);
+      localStorage.removeItem('vmart_auth_user');
+      setActiveTab('chat');
+      setActiveOrderId(null);
+    }
+  };
+
   const handleCreateOrder = (product, quantity) => {
     const newOrder = {
       orderId: `NM-${10000 + orders.length + 1}`,
-      customerId: 'CUST-1',
-      customerName: 'Test Customer',
+      customerId: currentUser?.id || 'CUST-1',
+      customerName: currentUser?.name || 'Customer',
       items: [{
         productId: product.id,
         productName: product.name,
@@ -125,7 +156,7 @@ function App() {
         body: JSON.stringify({ 
           message: userText,
           history: formattedHistory,
-          customerId: 'CUST-1',
+          customerId: currentUser?.id || 'CUST-1',
           activeOrderId: activeOrderId,
           orders: orders
         }),
@@ -201,7 +232,7 @@ function App() {
         body: JSON.stringify({
           message: `Please check the details and status for order ${selectedOrderId}.`,
           history: formattedHistory,
-          customerId: 'CUST-1',
+          customerId: currentUser?.id || 'CUST-1',
           activeOrderId: selectedOrderId,
           orderId: selectedOrderId,
           orders: orders
@@ -252,6 +283,10 @@ function App() {
     }
   };
 
+  if (!currentUser) {
+    return <Auth onLogin={handleLogin} />;
+  }
+
   return (
     <div className="app-container">
       {/* Sidebar */}
@@ -294,16 +329,100 @@ function App() {
           </div>
         </div>
         
-        <div style={{ padding: '20px', borderTop: '1px solid var(--border-light)' }}>
-           <div className={`chat-item ${activeTab === 'admin' ? 'active' : ''}`} onClick={() => setActiveTab('admin')} style={{ cursor: 'pointer' }}>
-              <div className="avatar" style={{background: 'var(--accent-gradient)'}}>
-                <Settings size={20} color="white" />
+        {/* Admin Console Section with Role-Based Access */}
+        <div style={{ padding: '12px 16px', borderTop: '1px solid var(--border-light)' }}>
+           <div 
+             className={`chat-item ${activeTab === 'admin' ? 'active' : ''}`} 
+             onClick={() => {
+               if (currentUser?.role === 'admin') {
+                 setActiveTab('admin');
+               } else {
+                 alert('Access Restricted: The Admin Console requires an Administrator account.\n\nPlease log out and sign in with an Admin account.');
+               }
+             }} 
+             style={{ cursor: 'pointer', opacity: currentUser?.role === 'admin' ? 1 : 0.75 }}
+           >
+              <div className="avatar" style={{background: currentUser?.role === 'admin' ? 'linear-gradient(135deg, #10b981, #06b6d4)' : '#334155'}}>
+                {currentUser?.role === 'admin' ? <ShieldCheck size={20} color="white" /> : <Lock size={18} color="#94a3b8" />}
               </div>
               <div className="chat-info">
                 <div className="chat-name">Admin Console</div>
-                <div className="chat-preview" style={{color: '#10b981'}}>Development</div>
+                <div className="chat-preview" style={{color: currentUser?.role === 'admin' ? '#10b981' : '#94a3b8', fontSize: '11px'}}>
+                  {currentUser?.role === 'admin' ? 'Verified Admin Access' : 'Admin Only (Locked)'}
+                </div>
               </div>
            </div>
+        </div>
+
+        {/* User Profile & Logout section at bottom of Sidebar */}
+        <div style={{
+          padding: '14px 16px',
+          borderTop: '1px solid var(--border-light)',
+          background: 'rgba(0, 0, 0, 0.25)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '10px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+            <div style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '10px',
+              background: currentUser?.role === 'admin' 
+                ? 'linear-gradient(135deg, #10b981, #06b6d4)' 
+                : 'var(--accent-gradient)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#ffffff',
+              fontWeight: 700,
+              fontSize: '14px',
+              flexShrink: 0
+            }}>
+              {currentUser?.role === 'admin' ? <Shield size={18} /> : (currentUser?.name?.[0]?.toUpperCase() || 'U')}
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <div style={{
+                fontSize: '13px',
+                fontWeight: 600,
+                color: 'var(--text-main)',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+              }}>
+                {currentUser?.name || 'Customer'}
+              </div>
+              <div style={{
+                fontSize: '11px',
+                color: currentUser?.role === 'admin' ? '#34d399' : '#818cf8',
+                fontWeight: 500
+              }}>
+                {currentUser?.role === 'admin' ? 'Administrator' : `Customer (${currentUser?.id})`}
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={handleLogout}
+            title="Log Out"
+            style={{
+              background: 'rgba(239, 68, 68, 0.12)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              color: '#f87171',
+              padding: '7px 10px',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              fontSize: '12px',
+              fontWeight: 600,
+              flexShrink: 0,
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <LogOut size={14} /> Log Out
+          </button>
         </div>
       </aside>
 
@@ -320,7 +439,7 @@ function App() {
               <div className="header-name">
                 {activeOrderId ? `Order Tracking — #${activeOrderId}` : 'V Mart AI Support'}
               </div>
-              <div className="header-status">Live Support connected</div>
+              <div className="header-status">Live Support connected • Signed in as {currentUser?.name}</div>
             </div>
           </div>
           <div className="header-actions">
@@ -355,6 +474,14 @@ function App() {
             <button className="icon-btn"><Video size={18} /></button>
             <button className="icon-btn"><Search size={18} /></button>
             <button className="icon-btn"><Info size={18} /></button>
+            <button 
+              onClick={handleLogout}
+              className="icon-btn" 
+              title="Log Out" 
+              style={{ color: '#f87171', borderColor: 'rgba(239, 68, 68, 0.3)', marginLeft: '4px' }}
+            >
+              <LogOut size={16} />
+            </button>
           </div>
         </header>
 
