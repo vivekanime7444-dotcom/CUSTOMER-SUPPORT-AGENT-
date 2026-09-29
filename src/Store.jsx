@@ -262,25 +262,27 @@ const Store = ({ onCreateOrder, onNavigateToOrders, onNavigateToSupport }) => {
             <div
               key={product.id}
               style={{
-                background: 'rgba(19, 20, 31, 0.75)',
-                backdropFilter: 'blur(12px)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '20px',
+                background: 'var(--bg-card)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+                border: '1px solid var(--border-light)',
+                borderRadius: '18px',
                 overflow: 'hidden',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
                 display: 'flex',
                 flexDirection: 'column',
-                position: 'relative'
+                position: 'relative',
+                boxShadow: 'var(--box-shadow-card)'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-4px)';
-                e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.4)';
-                e.currentTarget.style.boxShadow = '0 12px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(99, 102, 241, 0.15)';
+                e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.45)';
+                e.currentTarget.style.boxShadow = 'var(--box-shadow-hover)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
-                e.currentTarget.style.boxShadow = 'none';
+                e.currentTarget.style.borderColor = 'var(--border-light)';
+                e.currentTarget.style.boxShadow = 'var(--box-shadow-card)';
               }}
             >
               {/* Product Image Area */}

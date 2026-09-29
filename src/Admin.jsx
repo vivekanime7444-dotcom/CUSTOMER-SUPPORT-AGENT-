@@ -21,7 +21,8 @@ import {
   Settings, CheckCircle, XCircle, AlertTriangle, Clock, 
   Search, Plus, Trash2, Edit3, Lock, RefreshCw, Send, 
   TrendingUp, DollarSign, Truck, AlertCircle, Eye, ArrowRight,
-  Shield, CheckCircle2, ChevronRight, UserCheck, UserX, Key
+  Shield, CheckCircle2, ChevronRight, UserCheck, UserX, Key,
+  Sparkles, Radio, Layers
 } from 'lucide-react';
 
 const Admin = ({ orders, setOrders }) => {
@@ -32,7 +33,7 @@ const Admin = ({ orders, setOrders }) => {
   const [usersList, setUsersList] = useState(getUsers);
   const [productsList, setProductsList] = useState(getProducts);
 
-  // Sub-tab / filter states
+  // Support tickets state
   const [ticketFilter, setTicketFilter] = useState('PENDING'); // 'ALL', 'PENDING', 'IN_PROGRESS', 'RESOLVED'
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [adminReplyText, setAdminReplyText] = useState('');
@@ -63,9 +64,8 @@ const Admin = ({ orders, setOrders }) => {
   const [announcement, setAnnouncement] = useState(() => {
     return localStorage.getItem('vmart_store_announcement') || '🚀 Welcome to V MART! Free express delivery on all electronics.';
   });
-  const [autoEscalate, setAutoEscalate] = useState(true);
 
-  // Listen to cross-component updates
+  // Sync state with custom events
   useEffect(() => {
     const handleTicketsUpdated = () => setTickets(getTickets());
     const handleUsersUpdated = () => setUsersList(getUsers());
@@ -82,7 +82,6 @@ const Admin = ({ orders, setOrders }) => {
     };
   }, []);
 
-  // Update order helper
   const updateOrder = (updatedOrder) => {
     setOrders(prev => prev.map(o => o.orderId === updatedOrder.orderId ? updatedOrder : o));
   };
@@ -133,7 +132,7 @@ const Admin = ({ orders, setOrders }) => {
 
     setTickets(getTickets());
     setSelectedTicket(updated);
-    alert(`Resolution sent for Ticket #${selectedTicket.id}! The customer will receive this message directly in their chat session.`);
+    alert(`Resolution dispatched for Ticket #${selectedTicket.id}! The customer will receive this message directly in their live chat session.`);
   };
 
   // User Actions
@@ -159,7 +158,7 @@ const Admin = ({ orders, setOrders }) => {
       alert("Cannot delete the only remaining Administrator account.");
       return;
     }
-    if (window.confirm(`Are you sure you want to permanently delete user ${user.name} (${user.email})?`)) {
+    if (window.confirm(`Are you sure you want to delete user ${user.name} (${user.email})?`)) {
       deleteUser(user.id);
       setUsersList(getUsers());
     }
@@ -202,67 +201,98 @@ const Admin = ({ orders, setOrders }) => {
     setProductsList(getProducts());
   };
 
-  // Save announcements
   const handleSaveAnnouncement = () => {
     localStorage.setItem('vmart_store_announcement', announcement);
     alert("Store announcement updated.");
   };
 
   return (
-    <div style={{ display: 'flex', height: '100%', background: '#090d16', color: '#f8fafc', overflow: 'hidden' }}>
-      {/* Admin Sub-Sidebar */}
-      <div style={{
-        width: '260px',
-        background: '#0d1322',
-        borderRight: '1px solid rgba(255, 255, 255, 0.08)',
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%', background: 'var(--bg-base)', color: 'var(--text-main)', overflow: 'hidden' }}>
+      
+      {/* ===================== SINGLE TOP ADMIN MENU BAR ===================== */}
+      <header style={{
+        background: 'rgba(18, 25, 44, 0.85)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: '1px solid var(--border-light)',
+        padding: '14px 28px',
         display: 'flex',
-        flexDirection: 'column',
-        flexShrink: 0
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '16px',
+        zIndex: 20
       }}>
-        {/* Header */}
-        <div style={{ padding: '24px 20px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '10px',
-              background: 'linear-gradient(135deg, #10b981, #06b6d4)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#ffffff',
-              boxShadow: '0 0 15px rgba(16, 185, 129, 0.3)'
-            }}>
-              <ShieldCheck size={20} />
+        {/* Left: Badge & Live Status */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{
+            width: '38px',
+            height: '38px',
+            borderRadius: '11px',
+            background: 'linear-gradient(135deg, #10b981, #06b6d4)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#fff',
+            boxShadow: '0 0 16px rgba(16, 185, 129, 0.3)'
+          }}>
+            <ShieldCheck size={20} />
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontWeight: 700, fontSize: '16px', letterSpacing: '-0.02em', color: '#f8fafc' }}>
+                Admin Console
+              </span>
+              <span style={{
+                background: 'rgba(16, 185, 129, 0.15)',
+                border: '1px solid rgba(16, 185, 129, 0.35)',
+                color: '#34d399',
+                padding: '2px 8px',
+                borderRadius: '12px',
+                fontSize: '10px',
+                fontWeight: 700,
+                textTransform: 'uppercase'
+              }}>
+                Master Access
+              </span>
             </div>
-            <div>
-              <div style={{ fontWeight: 700, fontSize: '15px', color: '#f8fafc' }}>Admin Console</div>
-              <div style={{ fontSize: '11px', color: '#10b981', fontWeight: 600 }}>Master Control</div>
+            <div style={{ fontSize: '11px', color: '#94a3b8' }}>
+              Centralized System Controls & Support Escalation Hub
             </div>
           </div>
         </div>
 
-        {/* Navigation Tabs */}
-        <div style={{ padding: '16px 12px', flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', overflowY: 'auto' }}>
+        {/* Right: Single Segmented Menu Tabs */}
+        <nav style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '5px',
+          background: 'rgba(10, 14, 26, 0.65)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          borderRadius: '14px',
+          padding: '4px',
+          overflowX: 'auto',
+          maxWidth: '100%'
+        }}>
           {[
-            { id: 'overview', label: 'Overview & KPIs', icon: TrendingUp },
+            { id: 'overview', label: 'Overview', icon: TrendingUp },
             { 
               id: 'tickets', 
-              label: 'Human Support Tickets', 
+              label: 'Human Tickets', 
               icon: MessageSquare,
               badge: summary.pendingTickets > 0 ? summary.pendingTickets : null,
               badgeColor: '#ef4444'
             },
-            { id: 'users', label: 'User Management', icon: Users, badge: summary.totalUsers },
+            { id: 'users', label: 'Users', icon: Users, badge: summary.totalUsers },
             { 
               id: 'orders', 
-              label: 'Order Lifecycle', 
+              label: 'Orders', 
               icon: Package,
               badge: summary.pendingActions > 0 ? summary.pendingActions : null,
               badgeColor: '#f59e0b'
             },
             { id: 'products', label: 'eKart Inventory', icon: ShoppingBag, badge: summary.catalogCount },
-            { id: 'settings', label: 'Store & Controls', icon: Settings }
+            { id: 'settings', label: 'Settings', icon: Settings }
           ].map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -271,33 +301,34 @@ const Admin = ({ orders, setOrders }) => {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 style={{
-                  display: 'flex',
+                  display: 'inline-flex',
                   alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '12px 14px',
+                  gap: '7px',
+                  padding: '8px 14px',
                   borderRadius: '10px',
-                  background: isActive ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 182, 212, 0.1))' : 'transparent',
-                  border: isActive ? '1px solid rgba(16, 185, 129, 0.35)' : '1px solid transparent',
-                  color: isActive ? '#34d399' : '#94a3b8',
+                  border: '1px solid',
+                  borderColor: isActive ? 'rgba(99, 102, 241, 0.45)' : 'transparent',
+                  background: isActive ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.22), rgba(6, 182, 212, 0.12))' : 'transparent',
+                  color: isActive ? '#ffffff' : '#94a3b8',
                   cursor: 'pointer',
                   fontWeight: isActive ? 600 : 500,
-                  fontSize: '13px',
-                  textAlign: 'left',
-                  transition: 'all 0.2s ease'
+                  fontSize: '12.5px',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                  boxShadow: isActive ? '0 2px 10px rgba(99, 102, 241, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1)' : 'none'
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <Icon size={18} color={isActive ? '#34d399' : '#94a3b8'} />
-                  <span>{tab.label}</span>
-                </div>
+                <Icon size={15} color={isActive ? '#38bdf8' : '#94a3b8'} />
+                <span>{tab.label}</span>
                 {tab.badge && (
                   <span style={{
-                    background: tab.badgeColor || 'rgba(255, 255, 255, 0.1)',
+                    background: tab.badgeColor || 'rgba(255, 255, 255, 0.15)',
                     color: '#ffffff',
-                    fontSize: '11px',
+                    fontSize: '10px',
                     fontWeight: 700,
-                    padding: '2px 7px',
-                    borderRadius: '12px'
+                    padding: '1px 6px',
+                    borderRadius: '10px',
+                    marginLeft: '2px'
                   }}>
                     {tab.badge}
                   </span>
@@ -305,63 +336,58 @@ const Admin = ({ orders, setOrders }) => {
               </button>
             );
           })}
-        </div>
+        </nav>
+      </header>
 
-        {/* Live Admin Status Footer */}
-        <div style={{ padding: '16px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', background: '#0a0e18' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#10b981' }}>
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', boxShadow: '0 0 8px #10b981' }} />
-            <span>Admin Status: Available</span>
-          </div>
-          <div style={{ fontSize: '11px', color: '#64748b', marginTop: '4px' }}>
-            Ready to resolve customer issues
-          </div>
-        </div>
-      </div>
+      {/* ===================== WORKSPACE CONTENT ===================== */}
+      <div style={{
+        flex: 1,
+        overflowY: 'auto',
+        padding: '28px 32px',
+        background: 'radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.05), transparent 30%), var(--bg-base)'
+      }}>
 
-      {/* Main Workspace Area */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '32px 36px', background: '#090d16' }}>
-        
         {/* ===================== TAB 1: OVERVIEW & KPIS ===================== */}
         {activeTab === 'overview' && (
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
               <div>
-                <h1 style={{ fontSize: '26px', fontWeight: 700, margin: '0 0 6px 0', color: '#f8fafc' }}>
-                  System Command Center
+                <h1 style={{ fontSize: '24px', fontWeight: 700, margin: '0 0 4px 0', letterSpacing: '-0.025em', color: '#f8fafc' }}>
+                  System Overview & Operations
                 </h1>
                 <p style={{ margin: 0, fontSize: '13px', color: '#94a3b8' }}>
-                  Real-time visibility over users, support escalations, logistics, and eKart inventory
+                  Live metrics across customer inquiries, orders, users, and eKart stock
                 </p>
               </div>
               <div style={{
-                background: 'rgba(16, 185, 129, 0.1)',
+                background: 'rgba(16, 185, 129, 0.12)',
                 border: '1px solid rgba(16, 185, 129, 0.3)',
                 color: '#34d399',
                 padding: '6px 14px',
                 borderRadius: '20px',
                 fontSize: '12px',
                 fontWeight: 600,
-                display: 'flex',
+                display: 'inline-flex',
                 alignItems: 'center',
                 gap: '6px'
               }}>
-                <ShieldCheck size={16} /> All Systems Operational
+                <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#10b981', boxShadow: '0 0 8px #10b981' }} />
+                <span>Live Admin Sync Active</span>
               </div>
             </div>
 
-            {/* Top Attention Alert if pending tickets exist */}
+            {/* High Priority Attention Banner */}
             {summary.pendingTickets > 0 && (
               <div style={{
-                background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(185, 28, 28, 0.05))',
+                background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(185, 28, 28, 0.06) 100%)',
                 border: '1px solid rgba(239, 68, 68, 0.4)',
                 borderRadius: '16px',
-                padding: '18px 24px',
-                marginBottom: '28px',
+                padding: '18px 22px',
+                marginBottom: '24px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                boxShadow: '0 0 25px rgba(239, 68, 68, 0.15)'
+                boxShadow: '0 8px 30px rgba(239, 68, 68, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.08)'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                   <div style={{
@@ -372,7 +398,8 @@ const Admin = ({ orders, setOrders }) => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: '#f87171'
+                    color: '#f87171',
+                    border: '1px solid rgba(239, 68, 68, 0.3)'
                   }}>
                     <AlertTriangle size={22} />
                   </div>
@@ -388,7 +415,7 @@ const Admin = ({ orders, setOrders }) => {
                 <button
                   onClick={() => { setActiveTab('tickets'); setTicketFilter('PENDING'); }}
                   style={{
-                    background: '#ef4444',
+                    background: 'linear-gradient(135deg, #ef4444, #dc2626)',
                     color: '#ffffff',
                     border: 'none',
                     padding: '10px 18px',
@@ -398,92 +425,104 @@ const Admin = ({ orders, setOrders }) => {
                     fontSize: '13px',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '6px'
+                    gap: '6px',
+                    boxShadow: '0 4px 15px rgba(239, 68, 68, 0.35)'
                   }}
                 >
-                  Review Tickets <ArrowRight size={16} />
+                  Review Tickets <ArrowRight size={15} />
                 </button>
               </div>
             )}
 
             {/* KPI Cards Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '18px', marginBottom: '32px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '16px', marginBottom: '28px' }}>
               {[
-                { label: 'Total Revenue', val: `$${summary.revenue.toFixed(2)}`, icon: DollarSign, color: '#38bdf8', bg: 'rgba(56, 189, 248, 0.1)' },
-                { label: 'Total Orders', val: summary.totalOrders, icon: Package, color: '#818cf8', bg: 'rgba(129, 140, 248, 0.1)' },
-                { label: 'Pending Human Tickets', val: summary.pendingTickets, icon: MessageSquare, color: summary.pendingTickets > 0 ? '#f87171' : '#10b981', bg: summary.pendingTickets > 0 ? 'rgba(248, 113, 113, 0.1)' : 'rgba(16, 185, 129, 0.1)' },
-                { label: 'Registered Users', val: `${summary.activeUsers} / ${summary.totalUsers}`, icon: Users, color: '#34d399', bg: 'rgba(52, 211, 153, 0.1)' },
-                { label: 'Pending Cancellations/Returns', val: summary.pendingActions, icon: AlertCircle, color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.1)' },
-                { label: 'eKart Catalog Products', val: summary.catalogCount, icon: ShoppingBag, color: '#c084fc', bg: 'rgba(192, 132, 252, 0.1)' }
+                { label: 'Total Revenue', val: `$${summary.revenue.toFixed(2)}`, icon: DollarSign, color: '#38bdf8', bg: 'rgba(56, 189, 248, 0.12)' },
+                { label: 'Total Orders', val: summary.totalOrders, icon: Package, color: '#818cf8', bg: 'rgba(129, 140, 248, 0.12)' },
+                { label: 'Pending Human Tickets', val: summary.pendingTickets, icon: MessageSquare, color: summary.pendingTickets > 0 ? '#f87171' : '#10b981', bg: summary.pendingTickets > 0 ? 'rgba(248, 113, 113, 0.12)' : 'rgba(16, 185, 129, 0.12)' },
+                { label: 'Registered Users', val: `${summary.activeUsers} / ${summary.totalUsers}`, icon: Users, color: '#34d399', bg: 'rgba(52, 211, 153, 0.12)' },
+                { label: 'Pending Cancels/Returns', val: summary.pendingActions, icon: AlertCircle, color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.12)' },
+                { label: 'eKart Catalog Items', val: summary.catalogCount, icon: ShoppingBag, color: '#c084fc', bg: 'rgba(192, 132, 252, 0.12)' }
               ].map(kpi => {
                 const Icon = kpi.icon;
                 return (
                   <div key={kpi.label} style={{
-                    background: '#0d1322',
+                    background: 'rgba(18, 25, 44, 0.7)',
                     border: '1px solid rgba(255, 255, 255, 0.08)',
                     borderRadius: '16px',
                     padding: '20px',
-                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)'
+                    boxShadow: 'inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.35)',
+                    transition: 'all 0.25s ease'
                   }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                      <span style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 500 }}>{kpi.label}</span>
-                      <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: kpi.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: kpi.color }}>
-                        <Icon size={16} />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                      <span style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 600, letterSpacing: '0.02em' }}>{kpi.label}</span>
+                      <div style={{ width: '34px', height: '34px', borderRadius: '9px', background: kpi.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: kpi.color }}>
+                        <Icon size={17} />
                       </div>
                     </div>
-                    <div style={{ fontSize: '24px', fontWeight: 700, color: kpi.color }}>{kpi.val}</div>
+                    <div style={{ fontSize: '24px', fontWeight: 700, letterSpacing: '-0.02em', color: kpi.color }}>
+                      {kpi.val}
+                    </div>
                   </div>
                 );
               })}
             </div>
 
-            {/* Quick Actions Panel */}
-            <div style={{ background: '#0d1322', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '18px', padding: '24px', marginBottom: '28px' }}>
-              <h3 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: 600 }}>Quick Administration Actions</h3>
+            {/* Quick Action Cards */}
+            <div style={{
+              background: 'rgba(18, 25, 44, 0.7)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              borderRadius: '18px',
+              padding: '22px',
+              boxShadow: 'inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.35)'
+            }}>
+              <h3 style={{ margin: '0 0 14px 0', fontSize: '15px', fontWeight: 600, color: '#cbd5e1' }}>
+                Quick Administration Shortcuts
+              </h3>
               <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                 <button 
                   onClick={() => { setActiveTab('tickets'); setTicketFilter('PENDING'); }}
                   className="admin-glow-btn"
-                  style={{ background: 'rgba(239, 68, 68, 0.15)', borderColor: 'rgba(239, 68, 68, 0.4)', color: '#f87171' }}
+                  style={{ background: 'rgba(239, 68, 68, 0.12)', borderColor: 'rgba(239, 68, 68, 0.35)', color: '#f87171' }}
                 >
-                  <MessageSquare size={16} /> Solve Human Support Inquiries ({summary.pendingTickets})
+                  <MessageSquare size={15} /> Resolve Support Tickets ({summary.pendingTickets})
                 </button>
                 <button 
                   onClick={() => { setActiveTab('users'); setShowAddUserModal(true); }}
                   className="admin-glow-btn"
-                  style={{ background: 'rgba(52, 211, 153, 0.15)', borderColor: 'rgba(52, 211, 153, 0.4)', color: '#34d399' }}
+                  style={{ background: 'rgba(52, 211, 153, 0.12)', borderColor: 'rgba(52, 211, 153, 0.35)', color: '#34d399' }}
                 >
-                  <Users size={16} /> Add New User / Admin
+                  <Users size={15} /> Add New User
                 </button>
                 <button 
                   onClick={() => { setActiveTab('products'); setShowAddProductModal(true); }}
                   className="admin-glow-btn"
-                  style={{ background: 'rgba(129, 140, 248, 0.15)', borderColor: 'rgba(129, 140, 248, 0.4)', color: '#818cf8' }}
+                  style={{ background: 'rgba(129, 140, 248, 0.12)', borderColor: 'rgba(129, 140, 248, 0.35)', color: '#818cf8' }}
                 >
-                  <Plus size={16} /> Add New Product to eKart
+                  <Plus size={15} /> Add Product to eKart
                 </button>
                 <button 
                   onClick={() => { setActiveTab('orders'); }}
                   className="admin-glow-btn"
-                  style={{ background: 'rgba(56, 189, 248, 0.15)', borderColor: 'rgba(56, 189, 248, 0.4)', color: '#38bdf8' }}
+                  style={{ background: 'rgba(56, 189, 248, 0.12)', borderColor: 'rgba(56, 189, 248, 0.35)', color: '#38bdf8' }}
                 >
-                  <Package size={16} /> Process Pending Orders ({summary.pendingActions})
+                  <Package size={15} /> Process Orders ({summary.pendingActions} pending)
                 </button>
               </div>
             </div>
           </div>
         )}
 
-        {/* ===================== TAB 2: HUMAN SUPPORT & ESCALATION TICKETS ===================== */}
+        {/* ===================== TAB 2: SUPPORT TICKETS & HUMAN ESCALATIONS ===================== */}
         {activeTab === 'tickets' && (
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '14px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '22px', flexWrap: 'wrap', gap: '14px' }}>
               <div>
-                <h1 style={{ fontSize: '26px', fontWeight: 700, margin: '0 0 6px 0', color: '#f8fafc' }}>
-                  Contact Support & Human Escalation Management
+                <h1 style={{ fontSize: '24px', fontWeight: 700, margin: '0 0 4px 0', letterSpacing: '-0.025em', color: '#f8fafc' }}>
+                  Contact Support & Human Escalation Tickets
                 </h1>
                 <p style={{ margin: 0, fontSize: '13px', color: '#94a3b8' }}>
-                  When AI assistant cannot solve an issue, customer requests are routed here for direct administrator resolution
+                  Inquiries escalated by customers when the AI assistant cannot solve the issue
                 </p>
               </div>
 
@@ -499,14 +538,14 @@ const Admin = ({ orders, setOrders }) => {
                     key={filter.id}
                     onClick={() => setTicketFilter(filter.id)}
                     style={{
-                      padding: '8px 16px',
+                      padding: '7px 14px',
                       borderRadius: '8px',
                       border: '1px solid',
                       borderColor: ticketFilter === filter.id ? '#10b981' : 'rgba(255, 255, 255, 0.08)',
-                      background: ticketFilter === filter.id ? 'rgba(16, 185, 129, 0.2)' : '#0d1322',
+                      background: ticketFilter === filter.id ? 'rgba(16, 185, 129, 0.18)' : 'rgba(18, 25, 44, 0.7)',
                       color: ticketFilter === filter.id ? '#34d399' : '#94a3b8',
                       cursor: 'pointer',
-                      fontSize: '13px',
+                      fontSize: '12px',
                       fontWeight: 600
                     }}
                   >
@@ -516,8 +555,8 @@ const Admin = ({ orders, setOrders }) => {
               </div>
             </div>
 
-            {/* Split layout: Tickets list on left, Resolution workspace on right */}
-            <div style={{ display: 'grid', gridTemplateColumns: selectedTicket ? '1fr 1.2fr' : '1fr', gap: '20px' }}>
+            {/* Split layout: Tickets list + Resolution workspace */}
+            <div style={{ display: 'grid', gridTemplateColumns: selectedTicket ? '1fr 1.25fr' : '1fr', gap: '20px' }}>
               {/* Tickets List */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 {tickets
@@ -536,25 +575,25 @@ const Admin = ({ orders, setOrders }) => {
                           setTicketStatusSelect(ticket.status === 'RESOLVED' ? 'RESOLVED' : 'RESOLVED');
                         }}
                         style={{
-                          background: isSelected ? '#131b2e' : '#0d1322',
+                          background: isSelected ? 'rgba(28, 38, 66, 0.85)' : 'rgba(18, 25, 44, 0.7)',
                           border: '1px solid',
                           borderColor: isSelected ? '#10b981' : (isPending ? 'rgba(239, 68, 68, 0.4)' : 'rgba(255, 255, 255, 0.08)'),
-                          borderRadius: '14px',
+                          borderRadius: '16px',
                           padding: '18px 20px',
                           cursor: 'pointer',
-                          transition: 'all 0.2s ease',
-                          boxShadow: isPending ? '0 0 15px rgba(239, 68, 68, 0.08)' : 'none'
+                          transition: 'all 0.22s ease',
+                          boxShadow: 'inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.35)'
                         }}
                       >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <span style={{ fontWeight: 700, color: '#38bdf8', fontSize: '14px' }}>#{ticket.id}</span>
+                            <span style={{ fontWeight: 700, color: '#38bdf8', fontSize: '13.5px' }}>#{ticket.id}</span>
                             {isPending && (
                               <span style={{
                                 background: 'rgba(239, 68, 68, 0.2)',
                                 color: '#f87171',
                                 border: '1px solid rgba(239, 68, 68, 0.4)',
-                                padding: '2px 8px',
+                                padding: '2px 7px',
                                 borderRadius: '12px',
                                 fontSize: '10px',
                                 fontWeight: 700
@@ -573,20 +612,20 @@ const Admin = ({ orders, setOrders }) => {
                               {ticket.status}
                             </span>
                           </div>
-                          <span style={{ fontSize: '12px', color: '#64748b' }}>{ticket.createdAt}</span>
+                          <span style={{ fontSize: '11px', color: '#64748b' }}>{ticket.createdAt}</span>
                         </div>
 
-                        <div style={{ fontWeight: 600, fontSize: '15px', color: '#f8fafc', marginBottom: '6px' }}>
+                        <div style={{ fontWeight: 600, fontSize: '14.5px', color: '#f8fafc', marginBottom: '6px' }}>
                           {ticket.subject}
                         </div>
 
-                        <p style={{ margin: '0 0 10px 0', fontSize: '13px', color: '#94a3b8', lineHeight: '1.4' }}>
+                        <p style={{ margin: '0 0 10px 0', fontSize: '12.5px', color: '#94a3b8', lineHeight: '1.45' }}>
                           {ticket.message}
                         </p>
 
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', color: '#64748b' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11.5px', color: '#64748b' }}>
                           <div>
-                            <span>User: <strong style={{ color: '#cbd5e1' }}>{ticket.customerName}</strong> ({ticket.customerId})</span>
+                            <span>User: <strong style={{ color: '#cbd5e1' }}>{ticket.customerName}</strong></span>
                             {ticket.orderId && <span> • Order: <strong style={{ color: '#818cf8' }}>#{ticket.orderId}</strong></span>}
                           </div>
                           <div style={{ color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
@@ -598,19 +637,19 @@ const Admin = ({ orders, setOrders }) => {
                   })}
               </div>
 
-              {/* Selected Ticket Resolution Workspace */}
+              {/* Resolution Workspace */}
               {selectedTicket && (
                 <div style={{
-                  background: '#0d1322',
+                  background: 'rgba(18, 25, 44, 0.85)',
                   border: '1px solid rgba(16, 185, 129, 0.4)',
                   borderRadius: '18px',
                   padding: '24px',
-                  boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)'
+                  boxShadow: 'inset 0 1px 0 0 rgba(255, 255, 255, 0.1), 0 12px 36px rgba(0, 0, 0, 0.55)'
                 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '16px', marginBottom: '18px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '14px', marginBottom: '16px' }}>
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '18px', fontWeight: 700, color: '#f8fafc' }}>
+                        <span style={{ fontSize: '17px', fontWeight: 700, color: '#f8fafc' }}>
                           Ticket #{selectedTicket.id}
                         </span>
                         <span style={{
@@ -625,7 +664,7 @@ const Admin = ({ orders, setOrders }) => {
                         </span>
                       </div>
                       <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '2px' }}>
-                        Requested by {selectedTicket.customerName} ({selectedTicket.customerEmail})
+                        Customer: {selectedTicket.customerName} ({selectedTicket.customerEmail})
                       </div>
                     </div>
                     <button 
@@ -637,19 +676,19 @@ const Admin = ({ orders, setOrders }) => {
                   </div>
 
                   {/* Customer issue context */}
-                  <div style={{ background: '#090d16', padding: '14px 16px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.05)', marginBottom: '18px' }}>
+                  <div style={{ background: '#0a0e1a', padding: '14px 16px', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)', marginBottom: '16px' }}>
                     <div style={{ fontSize: '11px', color: '#38bdf8', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>
-                      Customer Issue Description:
+                      Customer Inquiry / Issue Description:
                     </div>
                     <div style={{ fontSize: '13px', color: '#e2e8f0', lineHeight: '1.5' }}>
                       {selectedTicket.message}
                     </div>
                   </div>
 
-                  {/* Chat snippet */}
+                  {/* Prior chat transcript */}
                   {selectedTicket.transcript && selectedTicket.transcript.length > 0 && (
-                    <div style={{ background: '#090d16', padding: '12px 16px', borderRadius: '10px', marginBottom: '18px', fontSize: '12px' }}>
-                      <div style={{ color: '#64748b', fontWeight: 600, marginBottom: '6px' }}>Prior Conversation Transcript:</div>
+                    <div style={{ background: '#0a0e1a', padding: '12px 16px', borderRadius: '12px', marginBottom: '16px', fontSize: '12px', border: '1px solid rgba(255, 255, 255, 0.04)' }}>
+                      <div style={{ color: '#64748b', fontWeight: 600, marginBottom: '6px' }}>Conversation Snippet:</div>
                       {selectedTicket.transcript.map((msg, idx) => (
                         <div key={idx} style={{ marginBottom: '4px', color: msg.sender === 'customer' ? '#cbd5e1' : '#818cf8' }}>
                           <strong>{msg.sender === 'customer' ? 'Customer' : 'AI Agent'}:</strong> {msg.text}
@@ -659,8 +698,8 @@ const Admin = ({ orders, setOrders }) => {
                   )}
 
                   {/* Quick Resolution Templates */}
-                  <div style={{ marginBottom: '16px' }}>
-                    <div style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '6px' }}>Quick Resolution Templates:</div>
+                  <div style={{ marginBottom: '14px' }}>
+                    <div style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '6px', fontWeight: 600 }}>Quick Resolution Templates:</div>
                     <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                       {[
                         "I have reviewed your inquiry and authorized an immediate full refund for this order.",
@@ -673,8 +712,8 @@ const Admin = ({ orders, setOrders }) => {
                           type="button"
                           onClick={() => setAdminReplyText(tmpl)}
                           style={{
-                            background: 'rgba(255, 255, 255, 0.05)',
-                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                            background: 'rgba(255, 255, 255, 0.04)',
+                            border: '1px solid rgba(255, 255, 255, 0.08)',
                             color: '#cbd5e1',
                             padding: '4px 10px',
                             borderRadius: '6px',
@@ -692,16 +731,16 @@ const Admin = ({ orders, setOrders }) => {
                   <form onSubmit={handleResolveTicket}>
                     <div style={{ marginBottom: '14px' }}>
                       <label style={{ display: 'block', fontSize: '12px', color: '#34d399', fontWeight: 600, marginBottom: '6px' }}>
-                        Official Admin Resolution Message (Delivered Directly into User's Chat):
+                        Admin Resolution Message (Delivered Live into User's Chat Session):
                       </label>
                       <textarea
-                        rows={4}
+                        rows={3}
                         value={adminReplyText}
                         onChange={(e) => setAdminReplyText(e.target.value)}
-                        placeholder="Type the official administrator response to the customer..."
+                        placeholder="Write official resolution for the customer..."
                         style={{
                           width: '100%',
-                          background: '#090d16',
+                          background: '#0a0e1a',
                           border: '1px solid rgba(16, 185, 129, 0.4)',
                           borderRadius: '10px',
                           color: '#f8fafc',
@@ -713,43 +752,43 @@ const Admin = ({ orders, setOrders }) => {
                       />
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '18px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
                       <div>
-                        <label style={{ display: 'block', fontSize: '12px', color: '#94a3b8', marginBottom: '6px' }}>Ticket Status:</label>
+                        <label style={{ display: 'block', fontSize: '11px', color: '#94a3b8', marginBottom: '5px' }}>Status:</label>
                         <select
                           value={ticketStatusSelect}
                           onChange={(e) => setTicketStatusSelect(e.target.value)}
                           style={{
                             width: '100%',
-                            background: '#090d16',
+                            background: '#0a0e1a',
                             border: '1px solid rgba(255, 255, 255, 0.1)',
                             color: '#f8fafc',
-                            padding: '10px',
+                            padding: '9px',
                             borderRadius: '8px',
-                            fontSize: '13px'
+                            fontSize: '12.5px'
                           }}
                         >
                           <option value="RESOLVED">RESOLVED (Solved by Admin)</option>
-                          <option value="IN_PROGRESS">IN PROGRESS (Admin Working On It)</option>
+                          <option value="IN_PROGRESS">IN PROGRESS (Working On It)</option>
                           <option value="PENDING">PENDING (Keep Active)</option>
                         </select>
                       </div>
 
                       <div>
-                        <label style={{ display: 'block', fontSize: '12px', color: '#94a3b8', marginBottom: '6px' }}>Internal Admin Notes:</label>
+                        <label style={{ display: 'block', fontSize: '11px', color: '#94a3b8', marginBottom: '5px' }}>Admin Notes:</label>
                         <input
                           type="text"
                           value={adminNotesText}
                           onChange={(e) => setAdminNotesText(e.target.value)}
-                          placeholder="Optional notes for other admins..."
+                          placeholder="Internal admin notes..."
                           style={{
                             width: '100%',
-                            background: '#090d16',
+                            background: '#0a0e1a',
                             border: '1px solid rgba(255, 255, 255, 0.1)',
                             color: '#f8fafc',
-                            padding: '10px',
+                            padding: '9px',
                             borderRadius: '8px',
-                            fontSize: '13px'
+                            fontSize: '12.5px'
                           }}
                         />
                       </div>
@@ -765,16 +804,16 @@ const Admin = ({ orders, setOrders }) => {
                         padding: '12px',
                         borderRadius: '10px',
                         fontWeight: 700,
-                        fontSize: '14px',
+                        fontSize: '13.5px',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         gap: '8px',
-                        boxShadow: '0 4px 15px rgba(16, 185, 129, 0.3)'
+                        boxShadow: '0 4px 16px rgba(16, 185, 129, 0.35)'
                       }}
                     >
-                      <Send size={16} /> Submit Resolution & Notify Customer in Live Chat
+                      <Send size={15} /> Submit Resolution & Notify Customer in Live Chat
                     </button>
                   </form>
                 </div>
@@ -786,13 +825,13 @@ const Admin = ({ orders, setOrders }) => {
         {/* ===================== TAB 3: USER MANAGEMENT ===================== */}
         {activeTab === 'users' && (
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '14px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '22px', flexWrap: 'wrap', gap: '14px' }}>
               <div>
-                <h1 style={{ fontSize: '26px', fontWeight: 700, margin: '0 0 6px 0', color: '#f8fafc' }}>
-                  User & Role Management
+                <h1 style={{ fontSize: '24px', fontWeight: 700, margin: '0 0 4px 0', letterSpacing: '-0.025em', color: '#f8fafc' }}>
+                  User Management & Access Control
                 </h1>
                 <p style={{ margin: 0, fontSize: '13px', color: '#94a3b8' }}>
-                  Control customer accounts, administrator privileges, account access, and password resets
+                  Manage customer and administrator accounts, roles, access statuses, and security credentials
                 </p>
               </div>
 
@@ -802,14 +841,15 @@ const Admin = ({ orders, setOrders }) => {
                   background: 'linear-gradient(135deg, #10b981, #06b6d4)',
                   color: '#ffffff',
                   border: 'none',
-                  padding: '10px 18px',
+                  padding: '9px 18px',
                   borderRadius: '10px',
                   fontWeight: 600,
                   fontSize: '13px',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px'
+                  gap: '8px',
+                  boxShadow: '0 4px 16px rgba(16, 185, 129, 0.25)'
                 }}
               >
                 <Plus size={16} /> Add New User
@@ -817,7 +857,7 @@ const Admin = ({ orders, setOrders }) => {
             </div>
 
             {/* Filter Bar */}
-            <div style={{ display: 'flex', gap: '14px', marginBottom: '20px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '12px', marginBottom: '18px', flexWrap: 'wrap' }}>
               <div style={{ position: 'relative', flex: 1, minWidth: '220px' }}>
                 <Search size={16} color="#64748b" style={{ position: 'absolute', left: '12px', top: '12px' }} />
                 <input
@@ -827,7 +867,7 @@ const Admin = ({ orders, setOrders }) => {
                   onChange={(e) => setUserSearch(e.target.value)}
                   style={{
                     width: '100%',
-                    background: '#0d1322',
+                    background: 'rgba(18, 25, 44, 0.7)',
                     border: '1px solid rgba(255, 255, 255, 0.08)',
                     borderRadius: '10px',
                     padding: '10px 14px 10px 38px',
@@ -842,7 +882,7 @@ const Admin = ({ orders, setOrders }) => {
                 value={userRoleFilter}
                 onChange={(e) => setUserRoleFilter(e.target.value)}
                 style={{
-                  background: '#0d1322',
+                  background: 'rgba(18, 25, 44, 0.7)',
                   border: '1px solid rgba(255, 255, 255, 0.08)',
                   color: '#f8fafc',
                   padding: '10px 16px',
@@ -857,7 +897,13 @@ const Admin = ({ orders, setOrders }) => {
             </div>
 
             {/* Users Table */}
-            <div style={{ background: '#0d1322', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.08)', overflow: 'hidden' }}>
+            <div style={{
+              background: 'rgba(18, 25, 44, 0.7)',
+              borderRadius: '16px',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              overflow: 'hidden',
+              boxShadow: 'inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.35)'
+            }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13px' }}>
                 <thead>
                   <tr style={{ background: 'rgba(255, 255, 255, 0.03)', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', color: '#94a3b8' }}>
@@ -886,7 +932,7 @@ const Admin = ({ orders, setOrders }) => {
                               width: '34px',
                               height: '34px',
                               borderRadius: '8px',
-                              background: u.role === 'admin' ? 'linear-gradient(135deg, #10b981, #06b6d4)' : 'linear-gradient(135deg, #6366f1, #a855f7)',
+                              background: u.role === 'admin' ? 'linear-gradient(135deg, #10b981, #06b6d4)' : 'linear-gradient(135deg, #6366f1, #3b82f6)',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
@@ -1000,9 +1046,9 @@ const Admin = ({ orders, setOrders }) => {
 
             {/* Add User Modal */}
             {showAddUserModal && (
-              <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
-                <div style={{ background: '#0d1322', border: '1px solid rgba(16, 185, 129, 0.4)', borderRadius: '16px', padding: '28px', width: '440px', maxWidth: '90%' }}>
-                  <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', color: '#f8fafc' }}>Create New Account</h3>
+              <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+                <div style={{ background: '#0e1424', border: '1px solid rgba(16, 185, 129, 0.4)', borderRadius: '18px', padding: '28px', width: '440px', maxWidth: '90%', boxShadow: '0 20px 50px rgba(0,0,0,0.6)' }}>
+                  <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', color: '#f8fafc' }}>Create Account</h3>
                   <form onSubmit={handleCreateUser}>
                     <div style={{ marginBottom: '12px' }}>
                       <label style={{ display: 'block', fontSize: '12px', color: '#94a3b8', marginBottom: '4px' }}>Full Name:</label>
@@ -1013,14 +1059,14 @@ const Admin = ({ orders, setOrders }) => {
                       <input type="email" required value={newUserData.email} onChange={e => setNewUserData({...newUserData, email: e.target.value})} className="admin-input-full" placeholder="e.g. jane@example.com" />
                     </div>
                     <div style={{ marginBottom: '12px' }}>
-                      <label style={{ display: 'block', fontSize: '12px', color: '#94a3b8', marginBottom: '4px' }}>Initial Password:</label>
-                      <input type="password" required value={newUserData.password} onChange={e => setNewUserData({...newUserData, password: e.target.value})} className="admin-input-full" placeholder="Minimum 6 characters" />
+                      <label style={{ display: 'block', fontSize: '12px', color: '#94a3b8', marginBottom: '4px' }}>Password:</label>
+                      <input type="password" required value={newUserData.password} onChange={e => setNewUserData({...newUserData, password: e.target.value})} className="admin-input-full" placeholder="Min 6 characters" />
                     </div>
                     <div style={{ marginBottom: '18px' }}>
-                      <label style={{ display: 'block', fontSize: '12px', color: '#94a3b8', marginBottom: '4px' }}>Account Role:</label>
+                      <label style={{ display: 'block', fontSize: '12px', color: '#94a3b8', marginBottom: '4px' }}>Role:</label>
                       <select value={newUserData.role} onChange={e => setNewUserData({...newUserData, role: e.target.value})} className="admin-input-full">
-                        <option value="user">Customer (Regular User)</option>
-                        <option value="admin">Administrator (Full Admin Access)</option>
+                        <option value="user">Customer (Regular Account)</option>
+                        <option value="admin">Administrator (Full Access)</option>
                       </select>
                     </div>
                     <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
@@ -1034,11 +1080,11 @@ const Admin = ({ orders, setOrders }) => {
 
             {/* Password Reset Modal */}
             {passwordResetUser && (
-              <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
-                <div style={{ background: '#0d1322', border: '1px solid rgba(56, 189, 248, 0.4)', borderRadius: '16px', padding: '24px', width: '380px', maxWidth: '90%' }}>
-                  <h3 style={{ margin: '0 0 8px 0', fontSize: '17px', color: '#f8fafc' }}>Reset User Password</h3>
+              <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+                <div style={{ background: '#0e1424', border: '1px solid rgba(56, 189, 248, 0.4)', borderRadius: '18px', padding: '24px', width: '380px', maxWidth: '90%', boxShadow: '0 20px 50px rgba(0,0,0,0.6)' }}>
+                  <h3 style={{ margin: '0 0 8px 0', fontSize: '17px', color: '#f8fafc' }}>Reset Password</h3>
                   <p style={{ margin: '0 0 16px 0', fontSize: '12px', color: '#94a3b8' }}>
-                    Resetting password for: <strong style={{ color: '#f8fafc' }}>{passwordResetUser.name}</strong> ({passwordResetUser.email})
+                    Resetting password for: <strong style={{ color: '#f8fafc' }}>{passwordResetUser.name}</strong>
                   </p>
                   <input
                     type="password"
@@ -1061,18 +1107,18 @@ const Admin = ({ orders, setOrders }) => {
         {/* ===================== TAB 4: ORDER LIFECYCLE & LOGISTICS ===================== */}
         {activeTab === 'orders' && (
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '14px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '22px', flexWrap: 'wrap', gap: '14px' }}>
               <div>
-                <h1 style={{ fontSize: '26px', fontWeight: 700, margin: '0 0 6px 0', color: '#f8fafc' }}>
+                <h1 style={{ fontSize: '24px', fontWeight: 700, margin: '0 0 4px 0', letterSpacing: '-0.025em', color: '#f8fafc' }}>
                   Order Logistics & Lifecycle Controls
                 </h1>
                 <p style={{ margin: 0, fontSize: '13px', color: '#94a3b8' }}>
-                  Manage fulfillment, shipping dispatches, cancellation requests, and returns/refund approvals
+                  Manage dispatch, shipping carriers, cancellation approvals, and refund authorizations
                 </p>
               </div>
 
               {/* Status Filter */}
-              <div style={{ display: 'flex', gap: '8px' }}>
+              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                 {['ALL', 'ORDER_PLACED', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'].map(st => (
                   <button
                     key={st}
@@ -1082,7 +1128,7 @@ const Admin = ({ orders, setOrders }) => {
                       borderRadius: '8px',
                       border: '1px solid',
                       borderColor: orderStatusFilter === st ? '#38bdf8' : 'rgba(255, 255, 255, 0.08)',
-                      background: orderStatusFilter === st ? 'rgba(56, 189, 248, 0.15)' : '#0d1322',
+                      background: orderStatusFilter === st ? 'rgba(56, 189, 248, 0.15)' : 'rgba(18, 25, 44, 0.7)',
                       color: orderStatusFilter === st ? '#38bdf8' : '#94a3b8',
                       cursor: 'pointer',
                       fontSize: '12px',
@@ -1100,7 +1146,13 @@ const Admin = ({ orders, setOrders }) => {
               {orders
                 .filter(o => orderStatusFilter === 'ALL' || o.status === orderStatusFilter)
                 .map(order => (
-                  <div key={order.orderId} style={{ background: '#0d1322', padding: '22px', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                  <div key={order.orderId} style={{
+                    background: 'rgba(18, 25, 44, 0.7)',
+                    padding: '22px',
+                    borderRadius: '16px',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    boxShadow: 'inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.35)'
+                  }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', borderBottom: '1px solid rgba(255, 255, 255, 0.06)', paddingBottom: '12px' }}>
                       <div>
                         <span style={{ fontSize: '17px', fontWeight: 700, color: '#f8fafc', marginRight: '12px' }}>#{order.orderId}</span>
@@ -1130,7 +1182,7 @@ const Admin = ({ orders, setOrders }) => {
                     </div>
 
                     {/* Admin Action Controls */}
-                    <div style={{ background: '#090d16', padding: '14px 18px', borderRadius: '12px', display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
+                    <div style={{ background: '#0a0e1a', padding: '14px 18px', borderRadius: '12px', display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center', border: '1px solid rgba(255, 255, 255, 0.04)' }}>
                       <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginRight: '8px' }}>LIFECYCLE CONTROLS:</span>
 
                       {order.status === 'ORDER_PLACED' && (
@@ -1167,7 +1219,7 @@ const Admin = ({ orders, setOrders }) => {
                       {order.cancellation?.requested && order.cancellation.status === 'PENDING' && (
                         <div style={{ width: '100%', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '10px 14px', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <div style={{ color: '#f87171', fontSize: '13px' }}>
-                            <strong>Cancellation Requested:</strong> {order.cancellation.reason || 'Requested by user'}
+                            <strong>Cancellation Requested:</strong> {order.cancellation.reason || 'Requested by customer'}
                           </div>
                           <div style={{ display: 'flex', gap: '8px' }}>
                             <button className="admin-btn-danger" onClick={() => handleAction(adminApproveCancellation, order)}>Approve Cancellation</button>
@@ -1212,30 +1264,31 @@ const Admin = ({ orders, setOrders }) => {
         {/* ===================== TAB 5: EKART CATALOG & INVENTORY ===================== */}
         {activeTab === 'products' && (
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '14px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '22px', flexWrap: 'wrap', gap: '14px' }}>
               <div>
-                <h1 style={{ fontSize: '26px', fontWeight: 700, margin: '0 0 6px 0', color: '#f8fafc' }}>
+                <h1 style={{ fontSize: '24px', fontWeight: 700, margin: '0 0 4px 0', letterSpacing: '-0.025em', color: '#f8fafc' }}>
                   eKart Catalog & Inventory Control
                 </h1>
                 <p style={{ margin: 0, fontSize: '13px', color: '#94a3b8' }}>
-                  Add new gadgets, adjust retail pricing, manage stock quantities, or delete products
+                  Publish gadgets, adjust retail pricing, manage live stock quantities, or delete products
                 </p>
               </div>
 
               <button
                 onClick={() => setShowAddProductModal(true)}
                 style={{
-                  background: 'linear-gradient(135deg, #6366f1, #a855f7)',
+                  background: 'linear-gradient(135deg, #6366f1, #3b82f6)',
                   color: '#ffffff',
                   border: 'none',
-                  padding: '10px 18px',
+                  padding: '9px 18px',
                   borderRadius: '10px',
                   fontWeight: 600,
                   fontSize: '13px',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px'
+                  gap: '8px',
+                  boxShadow: '0 4px 16px rgba(99, 102, 241, 0.35)'
                 }}
               >
                 <Plus size={16} /> Add Product to Store
@@ -1245,7 +1298,13 @@ const Admin = ({ orders, setOrders }) => {
             {/* Products Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
               {productsList.map(product => (
-                <div key={product.id} style={{ background: '#0d1322', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.08)', overflow: 'hidden' }}>
+                <div key={product.id} style={{
+                  background: 'rgba(18, 25, 44, 0.7)',
+                  borderRadius: '16px',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  overflow: 'hidden',
+                  boxShadow: 'inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.35)'
+                }}>
                   <img src={product.image} alt={product.name} style={{ width: '100%', height: '160px', objectFit: 'cover' }} />
                   <div style={{ padding: '18px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
@@ -1264,7 +1323,7 @@ const Admin = ({ orders, setOrders }) => {
                         onChange={(e) => handleStockChange(product.id, e.target.value)}
                         style={{
                           width: '70px',
-                          background: '#090d16',
+                          background: '#0a0e1a',
                           border: '1px solid rgba(255, 255, 255, 0.1)',
                           color: '#f8fafc',
                           padding: '4px 8px',
@@ -1300,9 +1359,9 @@ const Admin = ({ orders, setOrders }) => {
 
             {/* Add Product Modal */}
             {showAddProductModal && (
-              <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
-                <div style={{ background: '#0d1322', border: '1px solid rgba(99, 102, 241, 0.4)', borderRadius: '16px', padding: '28px', width: '460px', maxWidth: '90%' }}>
-                  <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', color: '#f8fafc' }}>Add Product to eKart Store</h3>
+              <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+                <div style={{ background: '#0e1424', border: '1px solid rgba(99, 102, 241, 0.4)', borderRadius: '18px', padding: '28px', width: '460px', maxWidth: '90%', boxShadow: '0 20px 50px rgba(0,0,0,0.6)' }}>
+                  <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', color: '#f8fafc' }}>Add Product to eKart</h3>
                   <form onSubmit={handleCreateProduct}>
                     <div style={{ marginBottom: '12px' }}>
                       <label style={{ display: 'block', fontSize: '12px', color: '#94a3b8', marginBottom: '4px' }}>Product Name:</label>
@@ -1347,37 +1406,49 @@ const Admin = ({ orders, setOrders }) => {
         {/* ===================== TAB 6: STORE CONTROLS & SETTINGS ===================== */}
         {activeTab === 'settings' && (
           <div>
-            <h1 style={{ fontSize: '26px', fontWeight: 700, margin: '0 0 6px 0', color: '#f8fafc' }}>
+            <h1 style={{ fontSize: '24px', fontWeight: 700, margin: '0 0 4px 0', letterSpacing: '-0.025em', color: '#f8fafc' }}>
               Store & Global Controls
             </h1>
             <p style={{ margin: '0 0 24px 0', fontSize: '13px', color: '#94a3b8' }}>
-              Configure global storefront banners, AI escalation triggers, and demo data resets
+              Broadcast storefront announcements and reset test data
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '640px' }}>
               {/* Store Announcement */}
-              <div style={{ background: '#0d1322', padding: '20px', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                <h4 style={{ margin: '0 0 8px 0', fontSize: '15px', color: '#f8fafc' }}>Global Store Banner Announcement</h4>
-                <p style={{ margin: '0 0 12px 0', fontSize: '12px', color: '#94a3b8' }}>Broadcast messages to all visitors on the eKart store page</p>
+              <div style={{
+                background: 'rgba(18, 25, 44, 0.7)',
+                padding: '22px',
+                borderRadius: '16px',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                boxShadow: 'inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.35)'
+              }}>
+                <h4 style={{ margin: '0 0 8px 0', fontSize: '15px', color: '#f8fafc' }}>Store Banner Announcement</h4>
+                <p style={{ margin: '0 0 12px 0', fontSize: '12px', color: '#94a3b8' }}>Broadcast banner message across the eKart storefront</p>
                 <input
                   type="text"
                   value={announcement}
                   onChange={(e) => setAnnouncement(e.target.value)}
                   className="admin-input-full"
-                  style={{ marginBottom: '12px' }}
+                  style={{ marginBottom: '14px' }}
                 />
                 <button onClick={handleSaveAnnouncement} className="admin-confirm-btn">Save Announcement</button>
               </div>
 
               {/* Reset Demo Data */}
-              <div style={{ background: '#0d1322', padding: '20px', borderRadius: '16px', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+              <div style={{
+                background: 'rgba(18, 25, 44, 0.7)',
+                padding: '22px',
+                borderRadius: '16px',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                boxShadow: 'inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.35)'
+              }}>
                 <h4 style={{ margin: '0 0 8px 0', fontSize: '15px', color: '#f87171' }}>System Factory Reset</h4>
                 <p style={{ margin: '0 0 14px 0', fontSize: '12px', color: '#94a3b8' }}>
-                  Reset sample orders, tickets, and registered users back to clean defaults for fresh testing.
+                  Reset test orders, tickets, and user accounts back to clean initial factory defaults.
                 </p>
                 <button
                   onClick={() => {
-                    if (window.confirm("Reset all test orders, support tickets, and users to initial factory state?")) {
+                    if (window.confirm("Reset all test orders, support tickets, and users to clean factory state?")) {
                       localStorage.removeItem('vmart_support_tickets');
                       localStorage.removeItem('vmart_registered_users');
                       localStorage.removeItem('vmart_products_catalog');
@@ -1417,11 +1488,12 @@ const Admin = ({ orders, setOrders }) => {
           transition: all 0.2s ease;
         }
         .admin-glow-btn:hover {
-          transform: translateY(-1px);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
         .admin-input-full {
           width: 100%;
-          background: #090d16;
+          background: #0a0e1a;
           border: 1px solid rgba(255, 255, 255, 0.1);
           color: #f8fafc;
           padding: 10px 12px;
@@ -1433,16 +1505,16 @@ const Admin = ({ orders, setOrders }) => {
           border-color: #10b981;
         }
         .admin-input-small {
-          background: #090d16;
+          background: #0a0e1a;
           border: 1px solid rgba(255, 255, 255, 0.1);
           color: #f8fafc;
-          padding: 6px 10px;
+          padding: 7px 10px;
           border-radius: 6px;
           font-size: 12px;
           outline: none;
         }
         .admin-btn-action {
-          background: #334155;
+          background: #25334d;
           color: #f8fafc;
           border: none;
           padding: 7px 14px;
@@ -1451,7 +1523,7 @@ const Admin = ({ orders, setOrders }) => {
           font-size: 12px;
           font-weight: 600;
         }
-        .admin-btn-action:hover { background: #475569; }
+        .admin-btn-action:hover { background: #334466; }
         .admin-btn-danger {
           background: #ef4444;
           color: #fff;

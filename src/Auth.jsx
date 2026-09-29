@@ -240,13 +240,13 @@ const Auth = ({ onLogin }) => {
       <div style={{
         width: '100%',
         maxWidth: '460px',
-        background: 'rgba(19, 20, 31, 0.85)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
+        background: 'var(--bg-card)',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
+        border: '1px solid var(--border-light)',
         borderRadius: '24px',
         padding: '36px 32px',
-        boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(99, 102, 241, 0.1)',
+        boxShadow: 'var(--box-shadow-card)',
         position: 'relative',
         zIndex: 10
       }}>

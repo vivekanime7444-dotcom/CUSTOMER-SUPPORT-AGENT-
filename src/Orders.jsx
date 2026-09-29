@@ -303,13 +303,14 @@ const Orders = ({ orders, setOrders, onNavigateToStore, onNavigateToChat }) => {
             <div 
               key={order.orderId} 
               style={{ 
-                background: 'rgba(19, 20, 31, 0.7)', 
+                background: 'var(--bg-card)', 
                 backdropFilter: 'blur(16px)',
-                border: '1px solid rgba(255, 255, 255, 0.08)', 
+                WebkitBackdropFilter: 'blur(16px)',
+                border: '1px solid var(--border-light)', 
                 borderRadius: '18px', 
                 padding: '24px 28px',
                 transition: 'all 0.25s ease',
-                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)'
+                boxShadow: 'var(--box-shadow-card)'
               }}
             >
               {/* Order Card Top Bar */}
