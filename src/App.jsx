@@ -10,6 +10,7 @@ import Store from './Store';
 import Orders from './Orders';
 import Admin from './Admin';
 import Auth from './Auth';
+import FormattedMessage from './FormattedMessage';
 import { INITIAL_ORDERS } from './mockData';
 import { 
   createTicket, getCustomerTickets, getUndeliveredAdminReplies, markRepliesDelivered 
@@ -676,7 +677,7 @@ function App() {
                     </div>
                   )}
 
-                  {msg.text}
+                  <FormattedMessage text={msg.text} sender={msg.sender} />
 
                   {msg.sender === 'agent' && msg.memoryUsed && msg.memoryContext && (
                     <div className="memory-used-indicator" data-testid="memory-indicator">

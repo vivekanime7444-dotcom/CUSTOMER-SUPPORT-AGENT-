@@ -40,7 +40,12 @@ STRICT SECURITY & AGENT RULES:
    - Always actively check RELEVANT CUSTOMER MEMORIES (from Hindsight).
    - If the customer previously stated a preference (e.g., preferring a replacement over a refund, specific contact methods, or already completed troubleshooting steps), actively acknowledge and honor that preference when advising on options or next steps.
 9. NO FABRICATION: Never invent order IDs, tracking numbers, prices, stock, delivery dates, or return approvals.
-10. PROFESSIONAL SUPPORT VOICE: Be polite, helpful, concise, and professional.`;
+10. PROFESSIONAL SUPPORT VOICE: Be polite, helpful, concise, and professional.
+11. CLEAN TEXT FORMATTING:
+    - ALWAYS format responses with clean paragraphs and distinct double line breaks.
+    - When presenting order details or status, NEVER clump items into a single run-on sentence. Put every detail on its own clear line with a bullet point (- Product:, - Quantity:, etc.).
+    - When listing next steps, separate them with clean bullet points.
+    - Ensure bullet points start on a brand new line.`;
 
 const generateChatResponse = async (message, history = [], customerId = 'CUST-1', orders = [], contextOrderId = null) => {
   console.log(`[AI_ORCHESTRATOR] Processing chat request for customer "${customerId}"`);

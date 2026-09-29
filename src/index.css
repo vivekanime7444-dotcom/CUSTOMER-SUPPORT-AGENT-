@@ -349,9 +349,36 @@ body {
   padding: 14px 18px;
   border-radius: 18px;
   font-size: 0.93rem;
-  line-height: 1.55;
+  line-height: 1.6;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
   letter-spacing: -0.01em;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+.formatted-message-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.formatted-message-container ul {
+  list-style-type: none !important;
+  padding-left: 0 !important;
+}
+
+.formatted-message-container li {
+  position: relative;
+  padding-left: 18px;
+}
+
+.formatted-message-container li::before {
+  content: '•';
+  position: absolute;
+  left: 4px;
+  top: 0;
+  color: #818cf8;
+  font-size: 16px;
+  line-height: 1.2;
 }
 
 .incoming .message-bubble {
