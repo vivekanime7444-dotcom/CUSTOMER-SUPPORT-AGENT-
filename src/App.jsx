@@ -449,30 +449,26 @@ function App() {
           </div>
         </div>
         
-        {/* Admin Console Section with Role-Based Access */}
-        <div style={{ padding: '12px 16px', borderTop: '1px solid var(--border-light)' }}>
-           <div 
-             className={`chat-item ${activeTab === 'admin' ? 'active' : ''}`} 
-             onClick={() => {
-               if (currentUser?.role === 'admin') {
-                 setActiveTab('admin');
-               } else {
-                 alert('Access Restricted: The Admin Console requires an Administrator account.\n\nPlease log out and sign in with an Admin account.');
-               }
-             }} 
-             style={{ cursor: 'pointer', opacity: currentUser?.role === 'admin' ? 1 : 0.75 }}
-           >
-              <div className="avatar" style={{background: currentUser?.role === 'admin' ? 'linear-gradient(135deg, #10b981, #06b6d4)' : '#334155'}}>
-                {currentUser?.role === 'admin' ? <ShieldCheck size={20} color="white" /> : <Lock size={18} color="#94a3b8" />}
-              </div>
-              <div className="chat-info">
-                <div className="chat-name">Admin Console</div>
-                <div className="chat-preview" style={{color: currentUser?.role === 'admin' ? '#10b981' : '#94a3b8', fontSize: '11px'}}>
-                  {currentUser?.role === 'admin' ? 'Verified Admin Access' : 'Admin Only (Locked)'}
+        {/* Admin Console Section - Only rendered for Administrator accounts */}
+        {currentUser?.role === 'admin' && (
+          <div style={{ padding: '12px 16px', borderTop: '1px solid var(--border-light)' }}>
+             <div 
+               className={`chat-item ${activeTab === 'admin' ? 'active' : ''}`} 
+               onClick={() => setActiveTab('admin')} 
+               style={{ cursor: 'pointer' }}
+             >
+                <div className="avatar" style={{background: 'linear-gradient(135deg, #10b981, #06b6d4)'}}>
+                  <ShieldCheck size={20} color="white" />
                 </div>
-              </div>
-           </div>
-        </div>
+                <div className="chat-info">
+                  <div className="chat-name">Admin Console</div>
+                  <div className="chat-preview" style={{color: '#10b981', fontSize: '11px'}}>
+                    Verified Admin Access
+                  </div>
+                </div>
+             </div>
+          </div>
+        )}
 
         {/* User Profile & Logout section at bottom of Sidebar */}
         <div style={{
