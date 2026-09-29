@@ -414,7 +414,7 @@ const AGENT_TOOLS_SCHEMAS = [
     type: 'function',
     function: {
       name: 'get_product',
-      description: 'Search catalog or get details about a NOVA MART product (price, stock, specs).',
+      description: 'Search catalog or get details about a V MART product (price, stock, specs).',
       parameters: {
         type: 'object',
         properties: {

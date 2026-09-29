@@ -15,7 +15,7 @@ const API_BASE = import.meta.env.VITE_API_URL || '';
 const INITIAL_MESSAGES = [
   {
     id: 1,
-    text: "Hello! Welcome to Nova Mart Support. How can I help you today?",
+    text: "Hello! Welcome to V Mart Support. How can I help you today?",
     sender: 'agent',
     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   }
@@ -261,7 +261,7 @@ function App() {
             <Sparkles size={20} color="white" />
           </div>
           <div>
-            <div className="brand-title">NOVA MART</div>
+            <div className="brand-title">V MART</div>
             <div className="brand-subtitle">Support Hub</div>
           </div>
         </div>
@@ -318,7 +318,7 @@ function App() {
             </div>
             <div>
               <div className="header-name">
-                {activeOrderId ? `Order Tracking — #${activeOrderId}` : 'Nova Mart AI Support'}
+                {activeOrderId ? `Order Tracking — #${activeOrderId}` : 'V Mart AI Support'}
               </div>
               <div className="header-status">Live Support connected</div>
             </div>
@@ -341,7 +341,7 @@ function App() {
                 setMessages([
                   {
                     id: Date.now(),
-                    text: "Hello! Welcome to Nova Mart Support. How can I help you today?",
+                    text: "Hello! Welcome to V Mart Support. How can I help you today?",
                     sender: 'agent',
                     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                   }

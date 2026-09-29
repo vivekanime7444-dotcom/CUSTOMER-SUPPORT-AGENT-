@@ -93,7 +93,7 @@ const Store = ({ onCreateOrder }) => {
 
   return (
     <div className="store-container" style={{ padding: '30px', height: '100%', overflowY: 'auto' }}>
-      <h2 style={{ marginBottom: '30px' }}>NOVA MART Store</h2>
+      <h2 style={{ marginBottom: '30px' }}>V MART Store</h2>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
         {PRODUCTS.map(product => (
           <div key={product.id} className="product-card" style={{ background: 'var(--bg-secondary)', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-light)', transition: 'transform 0.2s', cursor: 'pointer' }} onClick={() => setSelectedProduct(product)}>
